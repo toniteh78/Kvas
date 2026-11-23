@@ -123,7 +123,7 @@ td{padding:6px 4px;border-bottom:1px dashed var(--bd)}
 <div id="blend"></div>
 <button class="g" id="badd" style="margin-top:6px">+ Добави брашно</button>
 <div class="pc" id="bout"></div>
-<button id="buse" style="margin-top:10px; display:none; background:var(--ac); color:var(--on);">🍞 Използвай за нов хляб</button>
+<button id="buse" style="margin-top:10px; display:none; background:var(--ac); color:var(--on);">🍞 Използвай за нов хляб (с автоматична вода)</button>
 </div>
 
 <div class="c"><h2>🌡 Температура на тестото</h2><div class="mu">Колко топла да е водата, за да излезе тестото на желаната температура.</div>
@@ -265,7 +265,7 @@ var avgH = countG ? (totalH / countG).toFixed(1) : null;
 
 var extraInfo = '';
 if(avgW !== null) {
-  extraInfo = '<br>🌾 Макс. вода: <b>' + avgH + '%</b> · Средно W: <b>' + avgW + '</b>';
+  extraInfo = '<br><br>🌾 <b>Средно W: ' + avgW + '</b> | <b>Макс. вода: ' + avgH + '%</b>';
 }
 
 $('#pc').innerHTML=F&&W?'Хидратация <b>'+o.hyd.toFixed(1)+'%</b> · квас <b>'+o.st.toFixed(1)+'%</b> · сол <b>'+o.sl.toFixed(1)+'%</b>'+(E?'<br>Добавки: '+ex.map(function(x){return esc(x.n||'добавка')+' '+x.g+' г ('+(F?(x.g/F*100).toFixed(1):0)+'%)'}).join(', '):'')+'<br>Общо тесто: <b>'+Math.round(o.tot)+' г</b>' + extraInfo :'Въведи брашно и вода, за да видиш пекарските проценти.';
@@ -594,23 +594,37 @@ $('#badd').onclick=addBlendRow;
 
 $('#buse').onclick = function() {
     if(!window.BLEND || !window.BLEND.flours.length) return;
+    
+    // Изчистваме старите брашна
     $('#fl').innerHTML = '';
     
-    let totalFlour = 0;
+    var totalFlour = 0;
     window.BLEND.flours.forEach(function(f) {
         addF(f.n, f.g);
         totalFlour += f.g;
     });
     
-    // Изчисляване и попълване на водата на база максималната хидратация
-    if(window.BLEND.hAvg) {
-        let water = Math.round(totalFlour * (window.BLEND.hAvg / 100));
-        $('#w').value = water;
-    }
+    // Изчисляваме водата (спрямо средната максимална хидратация)
+    var water = Math.round(totalFlour * (window.BLEND.hAvg / 100));
+    $('#w').value = water;
     
+    // Изчисляваме квас (20%) и сол (2%), за да е готова рецептата
+    var starter = Math.round(totalFlour * 0.2);
+    var salt = (totalFlour * 0.02).toFixed(1);
+    $('#s').value = starter;
+    $('#sa').value = salt;
+    
+    // Обновяваме изчисленията
     calc();
+    
+    // Прехвърляме в таба "Нов хляб"
     document.querySelector('nav button[data-t="b"]').click();
     window.scrollTo(0,0);
+    
+    // Показваме съобщение за потвърждение
+    setTimeout(function() { 
+        alert('Успешно пренасяне!\n\nВодата е изчислена автоматично на ' + water + 'г. (спрямо ' + window.BLEND.hAvg.toFixed(1) + '% хидратация).\nКвасът и солта също са попълнени.'); 
+    }, 300);
 };
 
 flourList();
