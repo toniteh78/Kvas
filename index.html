@@ -57,7 +57,14 @@ td{padding:6px 4px;border-bottom:1px dashed var(--bd)}
 <label>Брашна (вид и грамове)</label><div id="fl"></div>
 <button class="g" id="af" style="margin-top:6px">+ Добави брашно</button>
 <div class="g2">
-  <div><label>Вода (г)</label><input id="w" type="number" inputmode="decimal"></div>
+  <div>
+    <label style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px;">
+      <span>Вода</span>
+      <span id="toggle-w" class="tog">г</span>
+    </label>
+    <input id="w" type="number" inputmode="decimal">
+    <div id="w-info" class="mu" style="font-size:11px; text-align:right; margin-top:2px; min-height:14px;"></div>
+  </div>
   <div>
     <label style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px;">
       <span>Квас</span>
@@ -222,7 +229,7 @@ b.classList.add('on');$('#t-'+b.dataset.t).classList.add('on');if(b.dataset.t===
 function theme(){document.documentElement.setAttribute('data-theme',S.theme);$('#th').value=S.theme}
 $('#th').onchange=function(){S.theme=this.value;save();theme()};
 
-window.inMode = {s: 'g', sa: 'g'};
+window.inMode = {w: 'g', s: 'g', sa: 'g'};
 
 function getFlourTotal() {
     var fl = [].map.call(document.querySelectorAll('#fl .row'), function(r){
@@ -244,6 +251,8 @@ function toggleMode(id, key) {
         el.style.color = 'var(--on)';
         if(F > 0 && inp.value) {
             inp.value = ((parseFloat(inp.value) || 0) / F * 100).toFixed(1);
+        } else {
+            inp.value = 0;
         }
     } else {
         window.inMode[key] = 'g';
@@ -252,10 +261,13 @@ function toggleMode(id, key) {
         el.style.color = 'var(--tx)';
         if(F > 0 && inp.value) {
             inp.value = Math.round(((parseFloat(inp.value) || 0) / 100) * F * 10) / 10;
+        } else {
+            inp.value = 0;
         }
     }
     calc();
 }
+document.getElementById('toggle-w').onclick = function() { toggleMode('w', 'w'); };
 document.getElementById('toggle-s').onclick = function() { toggleMode('s', 's'); };
 document.getElementById('toggle-sa').onclick = function() { toggleMode('sa', 'sa'); };
 
@@ -300,6 +312,16 @@ var fl=[].map.call(document.querySelectorAll('#fl .row'),function(r){
 });
 var rawFlour = fl.reduce(function(a,b){return a+b.g}, 0);
 
+var w_val = n($('#w').value);
+var w = 0;
+if(window.inMode['w'] === '%') {
+  w = rawFlour * (w_val / 100);
+  $('#w-info').textContent = '= ' + Math.round(w) + ' г';
+} else {
+  w = w_val;
+  $('#w-info').textContent = rawFlour ? '= ' + ((w / rawFlour) * 100).toFixed(1) + '%' : '';
+}
+
 var s_val = n($('#s').value);
 var sa_val = n($('#sa').value);
 var s = 0, sa = 0;
@@ -320,7 +342,7 @@ if(window.inMode['sa'] === '%') {
   $('#sa-info').textContent = rawFlour ? '= ' + ((sa / rawFlour) * 100).toFixed(1) + '%' : '';
 }
 
-var w=n($('#w').value), sh=n($('#sh').value)/100;
+var sh=n($('#sh').value)/100;
 var sf=s/(1+sh),F=rawFlour+sf,W=w+(s-sf);
 var ex=[].map.call(document.querySelectorAll('#ex .row'),function(r){var i=r.querySelectorAll('input');return{n:i[0].value.trim(),g:n(i[1].value)}}).filter(function(x){return x.g>0}),E=ex.reduce(function(a,b){return a+b.g},0);
 var o={fl:fl,ex:ex,w:w,s:s,sa:sa,sh:sh*100,hyd:F?W/F*100:0,st:F?s/F*100:0,sl:F?sa/F*100:0,tot:F+W+sa+E};
@@ -378,6 +400,7 @@ $('#list').onclick=function(e){var d=e.target.dataset;
 if(d.del&&confirm('Да изтрия ли хляба?')){S.del[d.del]=1;S.breads=S.breads.filter(function(x){return x.id!=d.del});save();render()}
 if(d.cp){var b=S.breads.find(function(x){return x.id==d.cp});fill(b.fl,b.w,b.s,b.sa,b.sh,b.ex,b.xs);$('#nm').value=b.name;window.scrollTo(0,0)}};
 function fill(fl,w,s,sa,sh,ex,xs){
+  if(window.inMode['w'] !== 'g') document.getElementById('toggle-w').click();
   if(window.inMode['s'] !== 'g') document.getElementById('toggle-s').click();
   if(window.inMode['sa'] !== 'g') document.getElementById('toggle-sa').click();
   $('#ex').innerHTML='';(ex||[]).forEach(function(x){addE(x.n,x.g)});
@@ -673,6 +696,7 @@ $('#badd').onclick=addBlendRow;
 $('#buse').onclick = function() {
     if(!window.BLEND || !window.BLEND.flours.length) return;
     
+    if(window.inMode['w'] !== 'g') document.getElementById('toggle-w').click();
     if(window.inMode['s'] !== 'g') document.getElementById('toggle-s').click();
     if(window.inMode['sa'] !== 'g') document.getElementById('toggle-sa').click();
     
