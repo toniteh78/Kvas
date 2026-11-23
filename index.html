@@ -45,6 +45,7 @@ nav{backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);background:col
 nav button{box-shadow:none;font-size:11px;padding:8px 2px}nav button.on{font-weight:700}nav button span{display:block;font-size:20px}
 details summary{font-size:16px}
 td{padding:6px 4px;border-bottom:1px dashed var(--bd)}
+.tog{cursor:pointer;padding:2px 8px;background:var(--bd);border-radius:8px;font-size:12px;font-weight:bold;transition:all 0.2s;user-select:none;}
 </style>
 </head>
 <body>
@@ -55,10 +56,26 @@ td{padding:6px 4px;border-bottom:1px dashed var(--bd)}
 <label>Име</label><input id="nm" placeholder="Напр. Селски хляб">
 <label>Брашна (вид и грамове)</label><div id="fl"></div>
 <button class="g" id="af" style="margin-top:6px">+ Добави брашно</button>
-<div class="g2"><div><label>Вода (г)</label><input id="w" type="number" inputmode="decimal"></div>
-<div><label>Квас (г)</label><input id="s" type="number" inputmode="decimal"></div>
-<div><label>Сол (г)</label><input id="sa" type="number" inputmode="decimal"></div>
-<div><label>Хидратация на кваса (%)</label><input id="sh" type="number" value="100"></div></div>
+<div class="g2">
+  <div><label>Вода (г)</label><input id="w" type="number" inputmode="decimal"></div>
+  <div>
+    <label style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px;">
+      <span>Квас</span>
+      <span id="toggle-s" class="tog">г</span>
+    </label>
+    <input id="s" type="number" inputmode="decimal">
+    <div id="s-info" class="mu" style="font-size:11px; text-align:right; margin-top:2px; min-height:14px;"></div>
+  </div>
+  <div>
+    <label style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px;">
+      <span>Сол</span>
+      <span id="toggle-sa" class="tog">г</span>
+    </label>
+    <input id="sa" type="number" inputmode="decimal">
+    <div id="sa-info" class="mu" style="font-size:11px; text-align:right; margin-top:2px; min-height:14px;"></div>
+  </div>
+  <div><label>Хидратация на кваса (%)</label><input id="sh" type="number" value="100"></div>
+</div>
 <label>Добавки (семена, зехтин, …)</label><div id="ex"></div><button class="g" id="ae" style="margin-top:6px">+ Добавка</button>
 <div class="pc" id="pc">Въведи брашно и вода, за да видиш пекарските проценти.</div>
 <h2 style="margin-top:14px">График</h2>
@@ -205,6 +222,43 @@ b.classList.add('on');$('#t-'+b.dataset.t).classList.add('on');if(b.dataset.t===
 function theme(){document.documentElement.setAttribute('data-theme',S.theme);$('#th').value=S.theme}
 $('#th').onchange=function(){S.theme=this.value;save();theme()};
 
+window.inMode = {s: 'g', sa: 'g'};
+
+function getFlourTotal() {
+    var fl = [].map.call(document.querySelectorAll('#fl .row'), function(r){
+      var gEl = r.querySelector('input[type="number"]');
+      return gEl ? (parseFloat(gEl.value) || 0) : 0;
+    });
+    return fl.reduce(function(a,b){return a+b}, 0);
+}
+
+function toggleMode(id, key) {
+    var el = document.getElementById('toggle-' + id);
+    var inp = document.getElementById(id);
+    var F = getFlourTotal();
+
+    if(window.inMode[key] === 'g') {
+        window.inMode[key] = '%';
+        el.textContent = '%';
+        el.style.background = 'var(--ac)';
+        el.style.color = 'var(--on)';
+        if(F > 0 && inp.value) {
+            inp.value = ((parseFloat(inp.value) || 0) / F * 100).toFixed(1);
+        }
+    } else {
+        window.inMode[key] = 'g';
+        el.textContent = 'г';
+        el.style.background = 'var(--bd)';
+        el.style.color = 'var(--tx)';
+        if(F > 0 && inp.value) {
+            inp.value = Math.round(((parseFloat(inp.value) || 0) / 100) * F * 10) / 10;
+        }
+    }
+    calc();
+}
+document.getElementById('toggle-s').onclick = function() { toggleMode('s', 's'); };
+document.getElementById('toggle-sa').onclick = function() { toggleMode('sa', 'sa'); };
+
 function addF(nm,g){
   var d=document.createElement('div');d.className='row';
   var opts='';
@@ -244,8 +298,30 @@ var fl=[].map.call(document.querySelectorAll('#fl .row'),function(r){
   var gEl = r.querySelector('input[type="number"]');
   return {n: nEl ? nEl.value.trim() : '', g: gEl ? n(gEl.value) : 0};
 });
-var w=n($('#w').value),s=n($('#s').value),sa=n($('#sa').value),sh=n($('#sh').value)/100;
-var sf=s/(1+sh),F=fl.reduce(function(a,b){return a+b.g},0)+sf,W=w+(s-sf);
+var rawFlour = fl.reduce(function(a,b){return a+b.g}, 0);
+
+var s_val = n($('#s').value);
+var sa_val = n($('#sa').value);
+var s = 0, sa = 0;
+
+if(window.inMode['s'] === '%') {
+  s = rawFlour * (s_val / 100);
+  $('#s-info').textContent = '= ' + Math.round(s) + ' г';
+} else {
+  s = s_val;
+  $('#s-info').textContent = rawFlour ? '= ' + ((s / rawFlour) * 100).toFixed(1) + '%' : '';
+}
+
+if(window.inMode['sa'] === '%') {
+  sa = rawFlour * (sa_val / 100);
+  $('#sa-info').textContent = '= ' + (Math.round(sa*10)/10) + ' г';
+} else {
+  sa = sa_val;
+  $('#sa-info').textContent = rawFlour ? '= ' + ((sa / rawFlour) * 100).toFixed(1) + '%' : '';
+}
+
+var w=n($('#w').value), sh=n($('#sh').value)/100;
+var sf=s/(1+sh),F=rawFlour+sf,W=w+(s-sf);
 var ex=[].map.call(document.querySelectorAll('#ex .row'),function(r){var i=r.querySelectorAll('input');return{n:i[0].value.trim(),g:n(i[1].value)}}).filter(function(x){return x.g>0}),E=ex.reduce(function(a,b){return a+b.g},0);
 var o={fl:fl,ex:ex,w:w,s:s,sa:sa,sh:sh*100,hyd:F?W/F*100:0,st:F?s/F*100:0,sl:F?sa/F*100:0,tot:F+W+sa+E};
 
@@ -302,6 +378,8 @@ $('#list').onclick=function(e){var d=e.target.dataset;
 if(d.del&&confirm('Да изтрия ли хляба?')){S.del[d.del]=1;S.breads=S.breads.filter(function(x){return x.id!=d.del});save();render()}
 if(d.cp){var b=S.breads.find(function(x){return x.id==d.cp});fill(b.fl,b.w,b.s,b.sa,b.sh,b.ex,b.xs);$('#nm').value=b.name;window.scrollTo(0,0)}};
 function fill(fl,w,s,sa,sh,ex,xs){
+  if(window.inMode['s'] !== 'g') document.getElementById('toggle-s').click();
+  if(window.inMode['sa'] !== 'g') document.getElementById('toggle-sa').click();
   $('#ex').innerHTML='';(ex||[]).forEach(function(x){addE(x.n,x.g)});
   $('#xs').innerHTML='';(xs||[]).forEach(function(x){addX(x.n,x.m)});
   $('#fl').innerHTML='';fl.forEach(function(f){addF(f.n,f.g)});
@@ -595,7 +673,9 @@ $('#badd').onclick=addBlendRow;
 $('#buse').onclick = function() {
     if(!window.BLEND || !window.BLEND.flours.length) return;
     
-    // Изчистваме старите брашна
+    if(window.inMode['s'] !== 'g') document.getElementById('toggle-s').click();
+    if(window.inMode['sa'] !== 'g') document.getElementById('toggle-sa').click();
+    
     $('#fl').innerHTML = '';
     
     var totalFlour = 0;
@@ -604,24 +684,19 @@ $('#buse').onclick = function() {
         totalFlour += f.g;
     });
     
-    // Изчисляваме водата (спрямо средната максимална хидратация)
     var water = Math.round(totalFlour * (window.BLEND.hAvg / 100));
     $('#w').value = water;
     
-    // Изчисляваме квас (20%) и сол (2%), за да е готова рецептата
     var starter = Math.round(totalFlour * 0.2);
     var salt = (totalFlour * 0.02).toFixed(1);
     $('#s').value = starter;
     $('#sa').value = salt;
     
-    // Обновяваме изчисленията
     calc();
     
-    // Прехвърляме в таба "Нов хляб"
     document.querySelector('nav button[data-t="b"]').click();
     window.scrollTo(0,0);
     
-    // Показваме съобщение за потвърждение
     setTimeout(function() { 
         alert('Успешно пренасяне!\n\nВодата е изчислена автоматично на ' + water + 'г. (спрямо ' + window.BLEND.hAvg.toFixed(1) + '% хидратация).\nКвасът и солта също са попълнени.'); 
     }, 300);
