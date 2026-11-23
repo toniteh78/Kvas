@@ -195,18 +195,71 @@ b.classList.add('on');$('#t-'+b.dataset.t).classList.add('on');if(b.dataset.t===
 function theme(){document.documentElement.setAttribute('data-theme',S.theme);$('#th').value=S.theme}
 $('#th').onchange=function(){S.theme=this.value;save();theme()};
 
-function addF(nm,g){var d=document.createElement('div');d.className='row';
-d.innerHTML='<input placeholder="Вид (напр. Бяло)" value="'+esc(nm||'')+'"><input type="number" inputmode="decimal" placeholder="г" value="'+(g||'')+'" style="max-width:90px"><button class="g">×</button>';
-d.querySelector('button').onclick=function(){d.remove();calc()};d.oninput=calc;$('#fl').appendChild(d)}
+function addF(nm,g){
+  var d=document.createElement('div');d.className='row';
+  var opts='';
+  var inDB = S.flours.some(function(f){return f.n===nm});
+  if(nm && !inDB) opts += '<option value="'+esc(nm)+'" selected>'+esc(nm)+'</option>';
+  
+  opts += S.flours.map(function(f){return '<option value="'+esc(f.n)+'"'+(f.n===nm?' selected':'')+'>'+esc(f.n)+'</option>'}).join('');
+  opts += '<option value="__custom__">✏️ Друго (ръчно)…</option>';
+  
+  if(!nm) opts = '<option value="">— Избери брашно —</option>' + opts;
+
+  d.innerHTML='<select style="flex:1">'+opts+'</select><input type="number" inputmode="decimal" placeholder="г" value="'+(g||'')+'" style="max-width:90px"><button class="g">×</button>';
+  
+  var sel = d.querySelector('select');
+  sel.onchange = function() {
+    if(this.value === '__custom__') {
+       var inp = document.createElement('input');
+       inp.type = 'text';
+       inp.placeholder = 'Вид брашно';
+       inp.style.flex = '1';
+       inp.oninput = calc;
+       d.replaceChild(inp, sel);
+       inp.focus();
+    }
+    calc();
+  };
+  
+  d.querySelector('button').onclick=function(){d.remove();calc()};
+  d.querySelector('input[type="number"]').oninput=calc;
+  $('#fl').appendChild(d);
+}
 $('#af').onclick=function(){addF()};
 
 function calc(){
-var fl=[].map.call(document.querySelectorAll('#fl .row'),function(r){var i=r.querySelectorAll('input');return{n:i[0].value.trim(),g:n(i[1].value)}});
+var fl=[].map.call(document.querySelectorAll('#fl .row'),function(r){
+  var nEl = r.querySelector('select, input[type="text"]');
+  var gEl = r.querySelector('input[type="number"]');
+  return {n: nEl ? nEl.value.trim() : '', g: gEl ? n(gEl.value) : 0};
+});
 var w=n($('#w').value),s=n($('#s').value),sa=n($('#sa').value),sh=n($('#sh').value)/100;
 var sf=s/(1+sh),F=fl.reduce(function(a,b){return a+b.g},0)+sf,W=w+(s-sf);
 var ex=[].map.call(document.querySelectorAll('#ex .row'),function(r){var i=r.querySelectorAll('input');return{n:i[0].value.trim(),g:n(i[1].value)}}).filter(function(x){return x.g>0}),E=ex.reduce(function(a,b){return a+b.g},0);
 var o={fl:fl,ex:ex,w:w,s:s,sa:sa,sh:sh*100,hyd:F?W/F*100:0,st:F?s/F*100:0,sl:F?sa/F*100:0,tot:F+W+sa+E};
-$('#pc').innerHTML=F&&W?'Хидратация <b>'+o.hyd.toFixed(1)+'%</b> · квас <b>'+o.st.toFixed(1)+'%</b> · сол <b>'+o.sl.toFixed(1)+'%</b>'+(E?'<br>Добавки: '+ex.map(function(x){return esc(x.n||'добавка')+' '+x.g+' г ('+(F?(x.g/F*100).toFixed(1):0)+'%)'}).join(', '):'')+'<br>Общо тесто: <b>'+Math.round(o.tot)+' г</b>':'Въведи брашно и вода, за да видиш пекарските проценти.';
+
+// Изчисляване на средно W и Хидратация от базата
+var totalW = 0, totalH = 0, countG = 0;
+fl.forEach(function(x){
+  if(x.g > 0 && x.n) {
+    var match = S.flours.find(function(f){ return f.n.toLowerCase() === x.n.toLowerCase(); });
+    if(match) {
+      totalW += (match.w * x.g);
+      totalH += (match.h * x.g);
+      countG += x.g;
+    }
+  }
+});
+var avgW = countG ? Math.round(totalW / countG) : null;
+var avgH = countG ? (totalH / countG).toFixed(1) : null;
+
+var extraInfo = '';
+if(avgW !== null) {
+  extraInfo = '<br>🌾 Макс. вода: <b>' + avgH + '%</b> · Средно W: <b>' + avgW + '</b>';
+}
+
+$('#pc').innerHTML=F&&W?'Хидратация <b>'+o.hyd.toFixed(1)+'%</b> · квас <b>'+o.st.toFixed(1)+'%</b> · сол <b>'+o.sl.toFixed(1)+'%</b>'+(E?'<br>Добавки: '+ex.map(function(x){return esc(x.n||'добавка')+' '+x.g+' г ('+(F?(x.g/F*100).toFixed(1):0)+'%)'}).join(', '):'')+'<br>Общо тесто: <b>'+Math.round(o.tot)+' г</b>' + extraInfo :'Въведи брашно и вода, за да видиш пекарските проценти.';
 return o}
 ['w','s','sa','sh'].forEach(function(i){$('#'+i).oninput=calc});
 
@@ -239,7 +292,12 @@ $('#list').onchange=function(e){var t=e.target,b=S.breads.find(function(x){retur
 $('#list').onclick=function(e){var d=e.target.dataset;
 if(d.del&&confirm('Да изтрия ли хляба?')){S.del[d.del]=1;S.breads=S.breads.filter(function(x){return x.id!=d.del});save();render()}
 if(d.cp){var b=S.breads.find(function(x){return x.id==d.cp});fill(b.fl,b.w,b.s,b.sa,b.sh,b.ex,b.xs);$('#nm').value=b.name;window.scrollTo(0,0)}};
-function fill(fl,w,s,sa,sh,ex,xs){$('#ex').innerHTML='';(ex||[]).forEach(function(x){addE(x.n,x.g)});$('#xs').innerHTML='';(xs||[]).forEach(function(x){addX(x.n,x.m)});$('#fl').innerHTML='';fl.forEach(function(f){addF(f.n,f.g)});$('#w').value=w;$('#s').value=s;$('#sa').value=sa;$('#sh').value=sh;calc()}
+function fill(fl,w,s,sa,sh,ex,xs){
+  $('#ex').innerHTML='';(ex||[]).forEach(function(x){addE(x.n,x.g)});
+  $('#xs').innerHTML='';(xs||[]).forEach(function(x){addX(x.n,x.m)});
+  $('#fl').innerHTML='';fl.forEach(function(f){addF(f.n,f.g)});
+  $('#w').value=w;$('#s').value=s;$('#sa').value=sa;$('#sh').value=sh;calc()
+}
 
 function kcalc(){var W=n($('#k1').value),L=n($('#k2').value)||1,h=n($('#k3').value)/100,st=n($('#k4').value)/100,sl=n($('#k5').value)/100,wg=n($('#k6').value)/100,sh=n($('#k7').value)/100;
 var F=W/(1+h+sl),s=F*st,sf=s/(1+sh),fresh=F-sf,fw=F*h-(s-sf),whole=fresh*wg,white=fresh-whole,salt=F*sl;
@@ -288,9 +346,9 @@ $('#ex').onclick=function(){var t=JSON.stringify(S);try{navigator.clipboard.writ
 $('#ib').onclick=function(){try{var d=JSON.parse($('#im').value),ids={};S.breads.forEach(function(b){ids[b.id]=1});
 (d.breads||[]).forEach(function(b){if(!ids[b.id])S.breads.push(b)});S.breads.sort(function(a,b){return b.id-a.id});S.starter=S.starter.concat((d.starter||[]).filter(function(q){return!S.starter.some(function(x){return x.d===q.d})}));
 if(d.flours&&d.flours.length)S.flours=d.flours;
-save();render();qr();flourList();refreshBlendFlourSelects();$('#ms').textContent='Импортирано.'}catch(e){$('#ms').textContent='Невалидни данни.'}};
+save();render();qr();flourList();refreshBlendFlourSelects();refreshNewBreadSelects();$('#ms').textContent='Импортирано.'}catch(e){$('#ms').textContent='Невалидни данни.'}};
 
-theme();qnow();qc();addF('Бяло');addF('Пълнозърнесто');calc();plan();kcalc();
+theme();qnow();qc();addF();addF();calc();plan();kcalc();
 var idb=null,ready=new Promise(function(res){try{var q=indexedDB.open('samun-ph',1);q.onupgradeneeded=function(){q.result.createObjectStore('p',{keyPath:'k'})};q.onsuccess=function(){idb=q.result;res()};q.onerror=function(){res()}}catch(e){res()}});
 function pAll(id){return ready.then(function(){return new Promise(function(res){if(!idb)return res([]);var o=[],r=idb.transaction('p').objectStore('p').openCursor();r.onsuccess=function(){var c=r.result;if(c){if(id==null||c.value.id==id)o.push(c.value);c.continue()}else res(o)};r.onerror=function(){res(o)}})})}
 function pDo(m,v){return new Promise(function(res){if(!idb)return res();var t=idb.transaction('p','readwrite');t.objectStore('p')[m](v);t.oncomplete=res;t.onerror=res})}
@@ -377,6 +435,17 @@ else if(a==='timer'){$('#tm1').value=S.guide.L[S.guide.i].m;$('#tm2').value=1;$(
 save();gRender()});
 gRender();recRender();
 
+function refreshNewBreadSelects() {
+  var opts = S.flours.map(function(f){return '<option value="'+esc(f.n)+'">'+esc(f.n)+'</option>'}).join('') + '<option value="__custom__">✏️ Друго (ръчно)…</option>';
+  document.querySelectorAll('#fl select').forEach(function(sel){
+    var cur = sel.value;
+    sel.innerHTML = '<option value="">— Избери брашно —</option>' + opts;
+    for(var i=0; i<sel.options.length; i++) {
+      if(sel.options[i].value === cur) { sel.selectedIndex = i; break; }
+    }
+  });
+}
+
 /* ===== БАЗА БРАШНА ===== */
 function flourList(){
   var el=$('#flist');
@@ -389,20 +458,20 @@ $('#fadd').onclick=function(){
   var name=$('#fn').value.trim();
   if(!name){alert('Въведи име на брашното.');return}
   S.flours.push({n:name,h:parseFloat($('#fh').value)||0,w:parseFloat($('#fw').value)||0});
-  save();$('#fn').value='';flourList();refreshBlendFlourSelects();
+  save();$('#fn').value='';flourList();refreshBlendFlourSelects();refreshNewBreadSelects();calc();
 };
 $('#flist').oninput=function(e){
   var d=e.target.dataset;
   if(d.fi!==undefined&&d.fk){
     S.flours[+d.fi][d.fk]=d.fk==='n'?e.target.value:(parseFloat(e.target.value)||0);
-    save();refreshBlendFlourSelects();
+    save();refreshBlendFlourSelects();refreshNewBreadSelects();calc();
   }
 };
 $('#flist').onclick=function(e){
   if(e.target.dataset.fd!==undefined){
     var i=+e.target.dataset.fd;
     if(confirm('Да изтрия ли "'+S.flours[i].n+'"?')){
-      S.flours.splice(i,1);save();flourList();refreshBlendFlourSelects();
+      S.flours.splice(i,1);save();flourList();refreshBlendFlourSelects();refreshNewBreadSelects();calc();
     }
   }
 };
@@ -511,7 +580,7 @@ if(R.flours&&R.flours.length)S.flours=R.flours}
 $('#bk-im').onchange=function(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();
 r.onload=async function(){try{var pkg=JSON.parse(r.result);if(!pkg.state)throw 0;
 bkMergeState(pkg.state);mergeRec(pkg.state.recipes);save();
-flourList();refreshBlendFlourSelects();
+flourList();refreshBlendFlourSelects();refreshNewBreadSelects();
 var have={};(await pAll(null)).forEach(function(p){have[p.k]=1});
 for(var p of(pkg.photos||[]))if(!have[p.k])await pDo('put',p);
 render();qr();bkMsg('Възстановено.');e.target.value=''}catch(x){bkMsg('Невалиден файл.')}};
