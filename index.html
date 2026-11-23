@@ -573,7 +573,8 @@ function blendCalc(){
   window.BLEND = {
     flours: rows_g.map(function(r){return {n:r.f.n, g:Math.round(r.g)}}),
     hAvg: hAvg,
-    wAvg: wAvg
+    wAvg: wAvg,
+    total: total
   };
   
   o.innerHTML=rows_g.map(function(r){
@@ -594,9 +595,19 @@ $('#badd').onclick=addBlendRow;
 $('#buse').onclick = function() {
     if(!window.BLEND || !window.BLEND.flours.length) return;
     $('#fl').innerHTML = '';
+    
+    let totalFlour = 0;
     window.BLEND.flours.forEach(function(f) {
         addF(f.n, f.g);
+        totalFlour += f.g;
     });
+    
+    // Изчисляване и попълване на водата на база максималната хидратация
+    if(window.BLEND.hAvg) {
+        let water = Math.round(totalFlour * (window.BLEND.hAvg / 100));
+        $('#w').value = water;
+    }
+    
     calc();
     document.querySelector('nav button[data-t="b"]').click();
     window.scrollTo(0,0);
