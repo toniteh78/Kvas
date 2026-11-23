@@ -252,7 +252,6 @@ var o={fl:fl,ex:ex,w:w,s:s,sa:sa,sh:sh*100,hyd:F?W/F*100:0,st:F?s/F*100:0,sl:F?s
 var totalW = 0, totalH = 0, countG = 0;
 fl.forEach(function(x){
   if(x.g > 0 && x.n) {
-    // Търсим брашното, дори ако в името има емоджи
     var match = S.flours.find(function(f){ return f.n.toLowerCase() === x.n.toLowerCase() || (f.c+' '+f.n).toLowerCase() === x.n.toLowerCase(); });
     if(match) {
       totalW += (match.w * x.g);
@@ -470,12 +469,12 @@ function flourList(){
   };
 
   el.innerHTML='<div class="pc"><div class="mu" style="margin-bottom:4px">Държава · Име · H% · W</div>'+S.flours.map(function(f,i){
-    return '<div class="row" style="margin:4px 0">' +
-           '<select data-fk="c" data-fi="'+i+'" style="max-width:55px; padding:4px; text-align:center;">'+cOpts(f.c||'🌍')+'</select>' +
-           '<input value="'+esc(f.n)+'" data-fk="n" data-fi="'+i+'" style="flex:1">' +
-           '<input type="number" inputmode="decimal" value="'+f.h+'" data-fk="h" data-fi="'+i+'" style="max-width:55px" placeholder="H%">' +
-           '<input type="number" inputmode="decimal" value="'+f.w+'" data-fk="w" data-fi="'+i+'" style="max-width:55px" placeholder="W">' +
-           '<button class="g" data-fd="'+i+'" style="width:auto;padding:4px 8px">×</button></div>';
+    return '<div class="row" style="margin:4px 0; gap: 4px; align-items:center;">' +
+           '<select data-fk="c" data-fi="'+i+'" style="width: 48px; padding: 6px 0px; text-align: center; font-size: 18px; -webkit-appearance: none; background: transparent; border: 1px solid var(--bd); border-radius: 8px;">'+cOpts(f.c||'🌍')+'</select>' +
+           '<input value="'+esc(f.n)+'" data-fk="n" data-fi="'+i+'" style="flex:1; padding: 6px 8px; font-size: 14px;">' +
+           '<input type="text" inputmode="decimal" value="'+f.h+'" data-fk="h" data-fi="'+i+'" style="width: 42px; padding: 6px 2px; text-align: center; font-size: 14px;" placeholder="H%">' +
+           '<input type="text" inputmode="decimal" value="'+f.w+'" data-fk="w" data-fi="'+i+'" style="width: 42px; padding: 6px 2px; text-align: center; font-size: 14px;" placeholder="W">' +
+           '<button class="g" data-fd="'+i+'" style="width:auto; padding: 6px 8px; font-size: 14px;">×</button></div>';
   }).join('')+'</div>';
 }
 $('#fadd').onclick=function(){
