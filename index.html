@@ -47,7 +47,7 @@ details summary{font-size:16px}
 td{padding:6px 4px;border-bottom:1px dashed var(--bd)}
 .tog{cursor:pointer;padding:2px 8px;background:var(--bd);border-radius:8px;font-size:12px;font-weight:bold;transition:all 0.2s;user-select:none;}
 
-/* Стилове за новите карти на стъпките */
+/* Стилове за картите на стъпките */
 .step-card { background: var(--bg); border: 1px solid var(--bd); padding: 10px; border-radius: 12px; margin-top: 8px; display: flex; flex-direction: column; gap: 8px; }
 .step-card .row-inner { display: flex; gap: 6px; align-items: center; }
 .step-card .row-inner select, .step-card .row-inner input { padding: 8px; font-size: 14px; margin: 0; }
@@ -91,13 +91,15 @@ td{padding:6px 4px;border-bottom:1px dashed var(--bd)}
 </div>
 <label>Добавки (семена, зехтин, …)</label><div id="ex"></div><button class="g" id="ae" style="margin-top:6px">+ Добавка</button>
 <div class="pc" id="pc">Въведи брашно и вода, за да видиш пекарските проценти.</div>
-<h2 style="margin-top:14px">График</h2>
+
+<h2 style="margin-top:14px">Начален час на насипната</h2>
 <label>Искам да извадя и пека на</label><input id="T" type="datetime-local">
 <div class="g2"><div><label>Насипна (ч)</label><input id="bk" type="number" value="4"></div>
 <div><label>Ретардация (ч)</label><input id="rt" type="number" value="12"></div>
 <div><label>Автолиза (мин)</label><input id="au" type="number" value="30"></div></div>
+
 <label>Допълнителни стъпки</label><div id="xs"></div><button class="g" id="ax" style="margin-top:6px">+ Стъпка</button>
-<div class="tl" id="tl"></div>
+
 <label>Бележки и стъпки на рецептата</label><textarea id="rn" rows="3"></textarea>
 <button id="sv" style="margin-top:10px">Запази хляба</button>
 <button class="g" id="sr" style="margin-top:8px">📖 Запази като рецепта</button></div>
@@ -379,19 +381,10 @@ return o}
 
 function plan(){
     var T=new Date($('#T').value).getTime();
-    if(!T){$('#tl').innerHTML='';return null}
+    if(!T){return null}
     var bk=n($('#bk').value)*36e5,rt=n($('#rt').value)*36e5,au=n($('#au').value)*6e4;
     var mix=T-rt-bk-au,bs=mix+au,fr=bs+bk;
     window.lastBs = bs;
-    
-    var ev=[[mix,'🥣 Замеси'],[bs,'⏱ Начало на насипната'],[fr,'❄️ Влез в хладилника'],[T,'🔥 Извади и пекай']];
-    
-    getXs().forEach(function(x){
-        ev.push([bs+x.m*6e4,'➕ '+esc(x.n||'Стъпка')]);
-    });
-    
-    ev.sort(function(a,b){return a[0]-b[0]});
-    $('#tl').innerHTML=ev.map(function(e){return '<div>'+e[1]+': <b>'+fmt(e[0])+'</b></div>'}).join('');
     return T;
 }
 ['T','bk','rt','au'].forEach(function(i){$('#'+i).oninput=plan});
@@ -542,6 +535,14 @@ function addX(nm, m, tStr){
   d.className='step-card';
   
   var opts = [
+    'Ферментолиза',
+    'Автолиза',
+    'Начало на добавяне на кваса',
+    'Добавяне на солта',
+    'Замесване',
+    'Край на замесване',
+    'Топла ферментация',
+    'Прибиране в хладилник',
     'Stretch & Fold',
     'Coil Fold',
     'Lamination (Ламиниране)',
@@ -553,7 +554,7 @@ function addX(nm, m, tStr){
   var isCustom = nm && opts.indexOf(nm) === -1 && nm !== 'Друго (ръчно)…';
   
   var selHTML = opts.map(function(o){
-    var selected = (o === nm) || (o === 'Друго (ръчно)…' && isCustom) || (!nm && o === 'Stretch & Fold');
+    var selected = (o === nm) || (o === 'Друго (ръчно)…' && isCustom) || (!nm && o === 'Ферментолиза');
     return '<option value="'+esc(o)+'"'+(selected?' selected':'')+'>'+esc(o)+'</option>';
   }).join('');
   
