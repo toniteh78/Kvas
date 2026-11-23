@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Квасен дневник</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Самун">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#b5651d">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+:root{--bg:#fbf6ee;--cd:#fff;--tx:#2b1d12;--mu:#7a6755;--ac:#b5651d;--bd:#e6d9c6;--on:#fff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]):not([data-theme="green"]){--bg:#15100c;--cd:#221a14;--tx:#f3e8d8;--mu:#a8957f;--ac:#e0903f;--bd:#3a2d22;--on:#15100c;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#15100c;--cd:#221a14;--tx:#f3e8d8;--mu:#a8957f;--ac:#e0903f;--bd:#3a2d22;--on:#15100c;color-scheme:dark}
+:root[data-theme="green"]{--bg:#f1f6ea;--cd:#fff;--tx:#1f2b18;--mu:#667a58;--ac:#4f8a2b;--bd:#d5e3c6;--on:#fff}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--tx);font:16px/1.4 system-ui,sans-serif;padding:12px 12px 80px;max-width:560px;margin:auto}
+h1{font-size:22px;margin:6px 0 10px}h2{font-size:17px;margin:0 0 8px}
+.c{background:var(--cd);border:1px solid var(--bd);border-radius:14px;padding:12px;margin-bottom:12px}
+label{display:block;font-size:12px;color:var(--mu);margin:8px 0 2px}
+input,select,textarea,button{font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:9px;width:100%}
+button{background:var(--ac);color:var(--on);border:0;font-weight:600;cursor:pointer}
+button.g{background:none;color:var(--ac);border:1px solid var(--ac)}
+.row{display:flex;gap:6px;margin-top:6px}.row>*{min-width:0}.row button{width:auto;padding:9px 12px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mu{color:var(--mu);font-size:13px}.pc{background:var(--bg);border-radius:10px;padding:8px;margin-top:8px;font-size:14px}
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--cd);border-top:1px solid var(--bd);padding-bottom:env(safe-area-inset-bottom,0px)}
+nav button{background:none;color:var(--mu);border-radius:0;padding:14px 4px;font-size:13px}nav button.on{color:var(--ac)}
+section{display:none}section.on{display:block}
+details{border-top:1px solid var(--bd);padding:8px 0}summary{cursor:pointer;font-weight:600}
+.tl div{padding:6px 0;border-bottom:1px dashed var(--bd)}
+.phs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:6px}.phs img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px}.phs div{position:relative}.phs button{position:absolute;top:2px;right:2px;width:auto;padding:2px 8px;background:rgba(0,0,0,.6);color:#fff}
+h1,h2{font-family:Georgia,'Times New Roman',serif;letter-spacing:.2px}
+h1{font-size:28px;margin:10px 0 14px}
+body{background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--ac) 7%,var(--bg)))}
+.c{box-shadow:0 2px 12px rgba(80,50,20,.09);border-radius:18px;padding:14px;animation:fi .25s ease}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+button{border-radius:12px;padding:11px;box-shadow:0 1px 3px rgba(0,0,0,.12);transition:transform .08s}
+button:active{transform:scale(.97)}
+input,select,textarea{border-radius:12px;padding:10px}
+nav{backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);background:color-mix(in srgb,var(--cd) 90%,transparent)}
+nav button{box-shadow:none;font-size:11px;padding:8px 2px}nav button.on{font-weight:700}nav button span{display:block;font-size:20px}
+details summary{font-size:16px}
+td{padding:6px 4px;border-bottom:1px dashed var(--bd)}
+</style>
+</head>
+<body>
+<h1>🍞 Квасен дневник</h1>
+
+<section id="t-b" class="on">
+<div class="c"><h2>Нов хляб</h2>
+<label>Име</label><input id="nm" placeholder="Напр. Селски хляб">
+<label>Брашна (вид и грамове)</label><div id="fl"></div>
+<button class="g" id="af" style="margin-top:6px">+ Добави брашно</button>
+<div class="g2"><div><label>Вода (г)</label><input id="w" type="number" inputmode="decimal"></div>
+<div><label>Квас (г)</label><input id="s" type="number" inputmode="decimal"></div>
+<div><label>Сол (г)</label><input id="sa" type="number" inputmode="decimal"></div>
+<div><label>Хидратация на кваса (%)</label><input id="sh" type="number" value="100"></div></div>
+<div class="pc" id="pc">Въведи брашно и вода, за да видиш пекарските проценти.</div>
+<h2 style="margin-top:14px">График</h2>
+<label>Искам да извадя и пека на</label><input id="T" type="datetime-local">
+<div class="g2"><div><label>Насипна (ч)</label><input id="bk" type="number" value="4"></div>
+<div><label>Ретардация (ч)</label><input id="rt" type="number" value="12"></div>
+<div><label>Автолиза (мин)</label><input id="au" type="number" value="30"></div></div>
+<div class="tl" id="tl"></div>
+<button id="sv" style="margin-top:10px">Запази хляба</button></div>
+<div id="list"></div>
+</section>
+
+<section id="t-k">
+<div class="c"><h2>⏱ Таймер за сгъвания</h2><div class="mu">Звъни, докато приложението е отворено. За напомняния при затворено приложение ползвай бутона 📅 Календар на хляба.</div>
+<div class="g2"><div><label>Интервал (мин)</label><input id="tm1" type="number" value="30"></div><div><label>Брой сгъвания</label><input id="tm2" type="number" value="4"></div></div>
+<div class="pc" id="tmo" style="font-size:26px;text-align:center">—</div>
+<div class="row"><button id="tms" style="flex:1">Старт</button><button class="g" id="tmx" style="flex:1">Стоп</button></div></div>
+<div class="c"><h2>Калкулатор</h2><div class="mu">Тегло на хляб и пекарски проценти → грамове.</div>
+<div class="g2"><div><label>Тегло на тестото (г)</label><input id="k1" type="number" value="900"></div>
+<div><label>Брой хлябове</label><input id="k2" type="number" value="1"></div>
+<div><label>Хидратация (%)</label><input id="k3" type="number" value="75"></div>
+<div><label>Квас (% от брашното)</label><input id="k4" type="number" value="20"></div>
+<div><label>Сол (%)</label><input id="k5" type="number" value="2"></div>
+<div><label>Пълнозърнесто (%)</label><input id="k6" type="number" value="20"></div>
+<div><label>Хидр. на кваса (%)</label><input id="k7" type="number" value="100"></div></div>
+<div class="pc" id="ko"></div>
+<button id="kb" style="margin-top:8px">Нов хляб с това</button></div>
+<div class="c"><h2>Температура и време</h2><div class="mu">Приблизителна насипна ферментация (ориентир, не закон).</div>
+<div class="g2"><div><label>Кухня °C</label><input id="t1" type="number" value="22"></div>
+<div><label>Квас %</label><input id="t2" type="number" value="20"></div></div>
+<div class="pc" id="to"></div>
+<button class="g" id="tb" style="margin-top:8px">Използвай в графика</button></div>
+</section>
+
+<section id="t-s">
+<div class="c"><h2>Калкулатор за хранене</h2><div class="mu">Колко квас ти трябва и с какво съотношение — получаваш грамовете. Работи и с десети, напр. 1:1,8:1,8.</div>
+<div class="g2"><div><label>Нужен квас общо (г)</label><input id="c1" type="number" inputmode="decimal" value="100"></div>
+<div><label>Съотношение (стар:брашно:вода)</label><input id="c2" value="1:5:5"></div></div>
+<div class="pc" id="c3"></div>
+<button id="cb" style="margin-top:8px">Попълни в журнала</button></div>
+<div class="c"><h2>Журнал на кваса</h2>
+<div class="g2"><div><label>Стар квас (г)</label><input id="q1" type="number"></div>
+<div><label>Брашно (г)</label><input id="q2" type="number"></div>
+<div><label>Вода (г)</label><input id="q3" type="number"></div>
+<div><label>Вид брашно</label><input id="q8" placeholder="Напр. ръжено"></div>
+<div><label>Темп. на стаята °C</label><input id="q4" type="number" inputmode="decimal"></div>
+<div><label>pH при хранене</label><input id="q9" type="number" step="0.1" inputmode="decimal"></div>
+<div><label>Мирис</label><select id="q5"><option>приятно кисел</option><option>плодов</option><option>млечен</option><option>оцет</option><option>ацетон</option><option>почти няма</option></select></div>
+<div><label>Съотношение (стар:брашно:вода)</label><input id="q13" placeholder="1:5:5"></div>
+<div><label>Кога го нахраних</label><input id="q11" type="datetime-local"></div></div>
+<button id="qa" style="margin-top:8px">Нахраних кваса</button></div>
+<div id="qch"></div>
+<div id="ql"></div>
+</section>
+
+<section id="t-st">
+<div class="c"><h2>Статистика</h2><div id="sto"></div></div>
+<div class="c"><h2>Оценки по хлябове</h2><div id="stc"></div></div>
+<div class="c"><h2>Сравнение</h2><div class="g2"><select id="cA"></select><select id="cB"></select></div><div id="cmp"></div></div>
+</section>
+<section id="t-m">
+<div class="c"><h2>Списък с продукти</h2><div class="mu">От планираните хлябове (с бъдеща дата).</div><div id="sp" class="pc"></div></div>
+<div class="c"><h2>Изглед</h2><select id="th"><option value="auto">Автоматично</option><option value="light">Светла</option><option value="dark">Тъмна</option><option value="green">Пшеница (зелена)</option></select></div>
+<div class="c"><h2>Резервно копие на файл</h2><div class="mu">Прави файл с всичко — хлябове, квас и снимки. Качваш го сам където искаш (Umbrel, облак, Файлове).</div>
+<button id="bk-ex" style="margin-top:8px">⬇️ Изтегли резервно копие</button>
+<label style="margin-top:10px">Възстанови от файл</label><input type="file" id="bk-im" accept="application/json">
+<div class="mu" id="bk-msg" style="margin-top:6px"></div></div>
+<div class="c"><h2>Размер на снимките</h2><div class="mu">По-малки снимки заемат по-малко място на телефона. Свиват се автоматично при качване.</div><select id="px"><option value="800">Малки (800 px, около 60 КБ)</option><option value="1000">Средни (1000 px, около 90 КБ)</option><option value="1400">Големи (1400 px, около 160 КБ)</option></select></div>
+<div class="c"><h2>Резервно копие</h2><button id="ex">Копирай данните</button>
+<label>Постави данни за импорт</label><textarea id="im" rows="3"></textarea>
+<button class="g" id="ib" style="margin-top:6px">Импорт (обединява)</button><div class="mu" id="ms"></div></div>
+</section>
+
+<nav><button data-t="b" class="on"><span>🍞</span>Хляб</button><button data-t="k"><span>⏱</span>Инструменти</button><button data-t="s"><span>🫙</span>Квас</button><button data-t="st"><span>📊</span>Статистика</button><button data-t="m"><span>⚙️</span>Още</button></nav>
+
+<script>
+var S={breads:[],starter:[],theme:'auto'};
+try{var r=localStorage.getItem('samun');if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}
+S.del=S.del||{};S.t=S.t||0;
+function save(){try{localStorage.setItem('samun',JSON.stringify(S))}catch(e){}}
+var $=function(s){return document.querySelector(s)},n=function(v){return parseFloat(v)||0};
+var esc=function(s){return String(s).replace(/[&<>]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;'}[c]})};
+var fmt=function(d){return new Date(d).toLocaleString('bg-BG',{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})};
+document.querySelectorAll('nav button').forEach(function(b){b.onclick=function(){
+document.querySelectorAll('nav button,section').forEach(function(e){e.classList.remove('on')});
+b.classList.add('on');$('#t-'+b.dataset.t).classList.add('on');if(b.dataset.t==='m')shop();if(b.dataset.t==='st')stats();if(b.dataset.t==='s')qch()}});
+function theme(){document.documentElement.setAttribute('data-theme',S.theme);$('#th').value=S.theme}
+$('#th').onchange=function(){S.theme=this.value;save();theme()};
+
+function addF(nm,g){var d=document.createElement('div');d.className='row';
+d.innerHTML='<input placeholder="Вид (напр. Бяло)" value="'+esc(nm||'')+'"><input type="number" inputmode="decimal" placeholder="г" value="'+(g||'')+'" style="max-width:90px"><button class="g">×</button>';
+d.querySelector('button').onclick=function(){d.remove();calc()};d.oninput=calc;$('#fl').appendChild(d)}
+$('#af').onclick=function(){addF()};
+
+function calc(){
+var fl=[].map.call(document.querySelectorAll('#fl .row'),function(r){var i=r.querySelectorAll('input');return{n:i[0].value.trim(),g:n(i[1].value)}});
+var w=n($('#w').value),s=n($('#s').value),sa=n($('#sa').value),sh=n($('#sh').value)/100;
+var sf=s/(1+sh),F=fl.reduce(function(a,b){return a+b.g},0)+sf,W=w+(s-sf);
+var o={fl:fl,w:w,s:s,sa:sa,sh:sh*100,hyd:F?W/F*100:0,st:F?s/F*100:0,sl:F?sa/F*100:0,tot:F+W+sa};
+$('#pc').innerHTML=F&&W?'Хидратация <b>'+o.hyd.toFixed(1)+'%</b> · квас <b>'+o.st.toFixed(1)+'%</b> · сол <b>'+o.sl.toFixed(1)+'%</b><br>Общо тесто: <b>'+Math.round(o.tot)+' г</b>':'Въведи брашно и вода, за да видиш пекарските проценти.';
+return o}
+['w','s','sa','sh'].forEach(function(i){$('#'+i).oninput=calc});
+
+function plan(){var T=new Date($('#T').value).getTime();if(!T){$('#tl').innerHTML='';return null}
+var bk=n($('#bk').value)*36e5,rt=n($('#rt').value)*36e5,au=n($('#au').value)*6e4;
+var mix=T-rt-bk-au,bs=mix+au,fr=bs+bk;
+$('#tl').innerHTML='<div>🥣 Замеси: <b>'+fmt(mix)+'</b></div><div>⏱ Начало на насипната: <b>'+fmt(bs)+'</b></div><div>❄️ Влез в хладилника: <b>'+fmt(fr)+'</b></div><div>🔥 Извади и пекай: <b>'+fmt(T)+'</b></div>';
+return T}
+['T','bk','rt','au'].forEach(function(i){$('#'+i).oninput=plan});
+var d0=new Date();d0.setDate(d0.getDate()+1);d0.setHours(8,0,0,0);
+$('#T').value=new Date(d0-d0.getTimezoneOffset()*6e4).toISOString().slice(0,16);
+
+$('#sv').onclick=function(){var o=calc();if(!o.fl.length||!o.w){alert('Добави брашно и вода.');return}
+var T=plan();o.id=Date.now();o.name=$('#nm').value.trim()||'Хляб от '+new Date().toLocaleDateString('bg-BG');
+o.T=T;o.bk=n($('#bk').value);o.rt=n($('#rt').value);o.rating=0;o.notes='';S.breads.unshift(o);save();render();$('#nm').value=''};
+
+function render(){$('#list').innerHTML=S.breads.map(function(b){
+var st='';for(var i=1;i<=10;i++)st+='<option'+(b.rating==i?' selected':'')+'>'+i+'</option>';
+return '<div class="c"><details><summary>'+esc(b.name)+' · '+b.hyd.toFixed(0)+'%'+(b.rating?' · ★'+b.rating:'')+'</summary>'
++'<div class="mu">'+b.fl.map(function(f){return esc(f.n||'брашно')+' '+f.g+' г'}).join(', ')+'; вода '+b.w+' г; квас '+b.s+' г; сол '+b.sa+' г</div>'
++(b.T?'<div class="mu">Печене: '+fmt(b.T)+' · насипна '+b.bk+' ч · ретардация '+b.rt+' ч</div>':'')
++'<label>Оценка (0–10)</label><select data-id="'+b.id+'" data-f="rating"><option>0</option>'+st+'</select>'
++'<div class="g2">'+['Коричка','Среда','Вкус','Аромат'].map(function(c,i){var o='<option>—</option>';for(var j=1;j<=5;j++)o+='<option'+(b['c'+i]==j?' selected':'')+'>'+j+'</option>';return '<div><label>'+c+' (1–5)</label><select data-id="'+b.id+'" data-f="c'+i+'">'+o+'</select></div>'}).join('')+'</div>'
++'<label>Снимки (до 3)</label><input type="file" accept="image/*" multiple data-ph="'+b.id+'"><div class="phs" id="ph-'+b.id+'"></div>'
++'<label>Бележки</label><textarea rows="3" data-id="'+b.id+'" data-f="notes">'+esc(b.notes)+'</textarea>'
++'<div class="row"><button class="g" data-cp="'+b.id+'">Дублирай</button><button class="g" data-ics="'+b.id+'">📅 Календар</button><button class="g" data-del="'+b.id+'">Изтрий</button></div></details></div>'}).join('')}
+$('#list').onchange=function(e){var t=e.target,b=S.breads.find(function(x){return x.id==t.dataset.id});if(b){b[t.dataset.f]=t.dataset.f==='rating'?n(t.value):t.value;save();if(t.dataset.f==='rating')render()}};
+$('#list').onclick=function(e){var d=e.target.dataset;
+if(d.del&&confirm('Да изтрия ли хляба?')){S.del[d.del]=1;S.breads=S.breads.filter(function(x){return x.id!=d.del});save();render()}
+if(d.cp){var b=S.breads.find(function(x){return x.id==d.cp});fill(b.fl,b.w,b.s,b.sa,b.sh);$('#nm').value=b.name;window.scrollTo(0,0)}};
+function fill(fl,w,s,sa,sh){$('#fl').innerHTML='';fl.forEach(function(f){addF(f.n,f.g)});$('#w').value=w;$('#s').value=s;$('#sa').value=sa;$('#sh').value=sh;calc()}
+
+function kcalc(){var W=n($('#k1').value),L=n($('#k2').value)||1,h=n($('#k3').value)/100,st=n($('#k4').value)/100,sl=n($('#k5').value)/100,wg=n($('#k6').value)/100,sh=n($('#k7').value)/100;
+var F=W/(1+h+sl),s=F*st,sf=s/(1+sh),fresh=F-sf,fw=F*h-(s-sf),whole=fresh*wg,white=fresh-whole,salt=F*sl;
+var o={white:white*L,whole:whole*L,w:fw*L,s:s*L,sa:salt*L};window.K=o;
+$('#ko').innerHTML=fw>0?'Бяло брашно: <b>'+Math.round(o.white)+' г</b><br>Пълнозърнесто: <b>'+Math.round(o.whole)+' г</b><br>Вода: <b>'+Math.round(o.w)+' г</b><br>Квас: <b>'+Math.round(o.s)+' г</b><br>Сол: <b>'+o.sa.toFixed(1)+' г</b>':'Хидратацията е твърде ниска за този % квас.'}
+for(var i=1;i<=7;i++)$('#k'+i).oninput=kcalc;
+$('#kb').onclick=function(){kcalc();var K=window.K;fill([{n:'Бяло',g:Math.round(K.white)},{n:'Пълнозърнесто',g:Math.round(K.whole)}],Math.round(K.w),Math.round(K.s),+K.sa.toFixed(1),n($('#k7').value)*100/100);
+document.querySelector('nav button[data-t=b]').click();window.scrollTo(0,0)};
+
+function tcalc(){var T=n($('#t1').value),st=n($('#t2').value)||1;var h=5*Math.pow(2,(24-T)/5)*Math.pow(20/st,0.6);window.H=h;
+$('#to').innerHTML='Насипна ферментация около <b>'+h.toFixed(1)+' ч</b> (при 24° и 20% квас ≈ 5 ч).'}
+$('#t1').oninput=$('#t2').oninput=tcalc;
+$('#tb').onclick=function(){$('#bk').value=window.H.toFixed(1);plan();document.querySelector('nav button[data-t=b]').click()};
+
+function qnow(){var d=new Date();$('#q11').value=new Date(d-d.getTimezoneOffset()*6e4).toISOString().slice(0,16)}
+$('#qa').onclick=function(){S.starter.unshift({d:new Date($('#q11').value).getTime()||Date.now(),a:n($('#q1').value),b:n($('#q2').value),c:n($('#q3').value),t:$('#q4').value,m:$('#q5').value,f:$('#q8').value.trim(),h:$('#q9').value,r:$('#q13').value.trim()});S.starter.sort(function(x,y){return y.d-x.d});save();qr();qnow()};
+function hrs(a,b){return((b-a)/36e5).toFixed(1)}
+function pr(s){var a=String(s).replace(/,/g,'.').split(/\s*[:\/]\s*|\s+/).map(parseFloat).filter(function(x){return x>=0});return a.length===3&&a[0]>0?a:null}
+function f1(x){return Math.round(x*10)/10}
+function qc(){var T=n($('#c1').value),r=pr($('#c2').value),o=$('#c3');
+if(!T||!r){o.innerHTML='Въведи колко квас ти трябва и съотношение, напр. 1:5:5 или 1:1,8:1,8.';window.QC=null;return}
+var p=r[0]+r[1]+r[2],x=[T*r[0]/p,T*r[1]/p,T*r[2]/p];window.QC={x:x,r:r};
+o.innerHTML='Стар квас: <b>'+f1(x[0])+' г</b><br>Брашно: <b>'+f1(x[1])+' г</b><br>Вода: <b>'+f1(x[2])+' г</b>'}
+$('#c1').oninput=$('#c2').oninput=qc;
+$('#cb').onclick=function(){if(!window.QC)return;var x=QC.x;$('#q1').value=f1(x[0]);$('#q2').value=f1(x[1]);$('#q3').value=f1(x[2]);$('#q13').value=QC.r.join(':');$('#q1').scrollIntoView({block:'center'})};
+function qr(){var pk=S.starter.filter(function(q){return q.pk}).map(function(q){return(q.pk-q.d)/36e5});
+var avg=pk.length?'<div class="pc">Средно до връх: <b>'+(pk.reduce(function(a,b){return a+b},0)/pk.length).toFixed(1)+' ч</b> ('+pk.length+' измервания)</div>':'';
+$('#ql').innerHTML=avg+S.starter.slice(0,20).map(function(q){var k=q.a||1;
+return '<div class="c" style="margin-top:12px"><b>'+fmt(q.d)+'</b><div class="mu">'+(q.r?esc(q.r):'1 : '+(q.b/k).toFixed(1)+' : '+(q.c/k).toFixed(1))+(q.f?' · '+esc(q.f):'')+(q.t?' · '+q.t+'°':'')+(q.h?' · pH '+q.h:'')+' · '+esc(q.m)+'</div>'
++(q.s?'<div style="margin-top:6px">🏠 В къщичката: '+fmt(q.s)+' (след '+hrs(q.d,q.s)+' ч)</div><label>Темп. в къщичката °C</label><input type="number" step="0.5" data-d="'+q.d+'" data-qf="st" value="'+(q.st||'')+'">':'<button class="g" data-d="'+q.d+'" data-act="s" style="margin-top:6px">Прибрах го в къщичката</button>')
++(q.pk?'<div style="margin-top:6px">📈 На върха: '+fmt(q.pk)+' — <b>'+hrs(q.d,q.pk)+' ч</b> след храненето</div>':q.p?'<div>📈 На върха след '+q.p+' ч</div>':'<button data-d="'+q.d+'" data-act="pk" style="margin-top:6px">На върха е сега</button>')
++'<label>pH при готовност (на върха)</label><input type="number" step="0.1" inputmode="decimal" data-d="'+q.d+'" data-qf="pp" value="'+(q.pp||'')+'">'+'<button class="g" data-d="'+q.d+'" data-act="x" style="margin-top:8px">Изтрий</button></div>'}).join('')}
+$('#ql').onclick=function(e){var t=e.target,a=t.dataset.act;if(!a)return;var q=S.starter.find(function(x){return x.d==t.dataset.d});if(!q)return;
+if(a==='x'){if(confirm('Да изтрия ли записа?')){S.del[q.d]=1;S.starter=S.starter.filter(function(x){return x!==q})}}else q[a]=Date.now();save();qr()};
+$('#ql').onchange=function(e){var t=e.target,q=S.starter.find(function(x){return x.d==t.dataset.d});if(q&&t.dataset.qf){q[t.dataset.qf]=t.value;save()}};
+
+function shop(){var m={};S.breads.filter(function(b){return b.T>Date.now()}).forEach(function(b){b.fl.forEach(function(f){var k=f.n||'Брашно';m[k]=(m[k]||0)+f.g});m['Сол']=(m['Сол']||0)+b.sa});
+var k=Object.keys(m);$('#sp').innerHTML=k.length?k.map(function(x){return esc(x)+': <b>'+Math.round(m[x])+' г</b>'}).join('<br>'):'Няма планирани хлябове.'}
+
+$('#ex').onclick=function(){var t=JSON.stringify(S);try{navigator.clipboard.writeText(t).then(function(){$('#ms').textContent='Копирано. Запази го някъде (бележки, чат).'},function(){$('#im').value=t;$('#ms').textContent='Копирай текста от полето.'})}catch(e){$('#im').value=t;$('#ms').textContent='Копирай текста от полето.'}};
+$('#ib').onclick=function(){try{var d=JSON.parse($('#im').value),ids={};S.breads.forEach(function(b){ids[b.id]=1});
+(d.breads||[]).forEach(function(b){if(!ids[b.id])S.breads.push(b)});S.breads.sort(function(a,b){return b.id-a.id});S.starter=S.starter.concat((d.starter||[]).filter(function(q){return!S.starter.some(function(x){return x.d===q.d})}));
+save();render();qr();$('#ms').textContent='Импортирано.'}catch(e){$('#ms').textContent='Невалидни данни.'}};
+
+theme();qnow();qc();addF('Бяло');addF('Пълнозърнесто');calc();plan();kcalc();
+var idb=null,ready=new Promise(function(res){try{var q=indexedDB.open('samun-ph',1);q.onupgradeneeded=function(){q.result.createObjectStore('p',{keyPath:'k'})};q.onsuccess=function(){idb=q.result;res()};q.onerror=function(){res()}}catch(e){res()}});
+function pAll(id){return ready.then(function(){return new Promise(function(res){if(!idb)return res([]);var o=[],r=idb.transaction('p').objectStore('p').openCursor();r.onsuccess=function(){var c=r.result;if(c){if(id==null||c.value.id==id)o.push(c.value);c.continue()}else res(o)};r.onerror=function(){res(o)}})})}
+function pDo(m,v){return new Promise(function(res){if(!idb)return res();var t=idb.transaction('p','readwrite');t.objectStore('p')[m](v);t.oncomplete=res;t.onerror=res})}
+function shrink(f,mx){return new Promise(function(res,rej){var im=new Image(),u=URL.createObjectURL(f);im.onload=function(){var k=Math.min(1,mx/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);res(c.toDataURL('image/jpeg',0.72))};im.onerror=rej;im.src=u})}
+function showPh(id){var el=$('#ph-'+id);if(!el)return;pAll(id).then(function(l){el.innerHTML=l.map(function(p){return '<div><img alt="" src="'+p.d+'"><button data-pd="'+p.k+'" data-bid="'+id+'">×</button></div>'}).join('')+(l.length?'<div class="mu" style="grid-column:1/4">≈ '+Math.round(l.reduce(function(a,p){return a+p.d.length*0.75},0)/1024)+' КБ общо</div>':'')})}
+var _r=render;render=function(){_r();S.breads.forEach(function(b){showPh(b.id)})};
+$('#list').addEventListener('change',function(e){var t=e.target,id=t.dataset.ph;if(!id)return;var fs=[].slice.call(t.files);t.value='';
+pAll(id).then(async function(l){var room=3-l.length;if(room<=0){alert('Най-много 3 снимки на хляб.');return}
+for(var f of fs.slice(0,room)){try{var d=await shrink(f,S.px||1000);await pDo('put',{k:id+'_'+Date.now()+Math.random().toString(36).slice(2,5),id:+id,d:d})}catch(x){alert('Снимката не може да се обработи.')}}
+showPh(id)})});
+$('#list').addEventListener('click',function(e){var d=e.target.dataset;if(d.pd&&confirm('Да изтрия ли снимката?'))pDo('delete',d.pd).then(function(){showPh(d.bid)})});
+$('#px').value=S.px||1000;$('#px').onchange=function(){S.px=+this.value;save()};
+pAll(null).then(function(l){var ids={};S.breads.forEach(function(b){ids[b.id]=1});l.forEach(function(p){if(!ids[p.id])pDo('delete',p.k)})});
+
+function bars(v,l,h){h=110;var w=Math.max(v.length*34+8,220),m=Math.max.apply(null,v.concat([1])),o='<div style="overflow-x:auto"><svg width="'+w+'" height="'+(h+34)+'" style="display:block">';
+v.forEach(function(x,i){var bh=Math.round(x/m*h),cx=i*34+17;o+='<rect x="'+(cx-13)+'" y="'+(h-bh+14)+'" width="26" height="'+bh+'" rx="5" style="fill:var(--ac)"/><text x="'+cx+'" y="'+(h-bh+10)+'" font-size="11" text-anchor="middle" fill="currentColor">'+(Math.round(x*10)/10)+'</text><text x="'+cx+'" y="'+(h+28)+'" font-size="10" text-anchor="middle" fill="currentColor" opacity=".6">'+esc(l[i])+'</text>'});
+return o+'</svg></div>'}
+function stats(){var B=S.breads,r=B.filter(function(b){return b.rating>0});
+var avg=function(a,k){return a.length?a.reduce(function(t,b){return t+(+b[k]||0)},0)/a.length:0};
+var best=r.slice().sort(function(a,b){return b.rating-a.rating})[0];
+$('#sto').innerHTML=B.length?'Хлябове: <b>'+B.length+'</b><br>Средна оценка: <b>'+(r.length?avg(r,'rating').toFixed(1):'—')+'</b><br>Средна хидратация: <b>'+avg(B,'hyd').toFixed(1)+'%</b><br>Най-добър: <b>'+(best?esc(best.name)+' ('+best.rating+')':'—')+'</b>':'Още няма хлябове.';
+var L=B.slice(0,12).reverse();$('#stc').innerHTML=r.length?bars(L.map(function(b){return+b.rating||0}),L.map(function(b){return(b.name||'').slice(0,5)})):'Добави оценки на хлябовете.';
+var op=B.map(function(b,i){return'<option value="'+i+'">'+esc(b.name)+'</option>'}).join('');$('#cA').innerHTML=op;$('#cB').innerHTML=op;if(B.length>1)$('#cB').value=1;cmp()}
+function cmp(){var B=S.breads,a=B[$('#cA').value],b=B[$('#cB').value];
+if(!a||!b){$('#cmp').innerHTML='<div class="mu" style="margin-top:8px">Нужни са поне два хляба.</div>';return}
+var R=[['Хидратация %',function(x){return x.hyd.toFixed(1)}],['Квас %',function(x){return x.st.toFixed(1)}],['Сол %',function(x){return x.sl.toFixed(1)}],['Насипна (ч)',function(x){return x.bk||'—'}],['Ретардация (ч)',function(x){return x.rt||'—'}],['Оценка',function(x){return x.rating||'—'}]];
+['Коричка','Среда','Вкус','Аромат'].forEach(function(c,i){R.push([c,function(x){return x['c'+i]||'—'}])});
+$('#cmp').innerHTML='<table style="width:100%;border-collapse:collapse;margin-top:8px;font-size:14px"><tr><td></td><td><b>'+esc(a.name)+'</b></td><td><b>'+esc(b.name)+'</b></td></tr>'+R.map(function(r){var x=r[1](a),y=r[1](b),d=x!=y?' style="background:var(--bg);font-weight:700"':'';return'<tr><td class="mu">'+r[0]+'</td><td'+d+'>'+x+'</td><td'+d+'>'+y+'</td></tr>'}).join('')+'</table>'}
+$('#cA').onchange=$('#cB').onchange=cmp;
+function qch(){var A=S.starter.filter(function(q){return q.pk}).slice(0,12).reverse(),h='',dt=function(q){return new Date(q.d).toLocaleDateString('bg-BG',{day:'numeric',month:'numeric'})};
+if(A.length)h+='<div class="c"><h2>Часове до връх</h2><div class="mu">Под колоната е температурата на стаята.</div>'+bars(A.map(function(q){return(q.pk-q.d)/36e5}),A.map(function(q){return q.t?q.t+'°':'—'}))+'</div>';
+var P=S.starter.filter(function(q){return+q.pp}).slice(0,12).reverse(),F=S.starter.filter(function(q){return+q.h}).slice(0,12).reverse();
+if(F.length)h+='<div class="c"><h2>pH при хранене</h2>'+bars(F.map(function(q){return+q.h}),F.map(dt))+'</div>';
+if(P.length)h+='<div class="c"><h2>pH на върха</h2>'+bars(P.map(function(q){return+q.pp}),P.map(dt))+'</div>';
+$('#qch').innerHTML=h}
+var _q=qr;qr=function(){_q();qch()};
+function ics(b){var H=36e5,fr=b.T-b.rt*H,bs=fr-b.bk*H,mx=bs-18e5,ev=[['Замеси',mx],['Начало на насипната',bs],['В хладилника',fr],['Пекай',b.T]];
+function f(t){return new Date(t).toISOString().replace(/[-:]/g,'').slice(0,15)+'Z'}
+var o='BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Samun//BG\r\n';
+ev.forEach(function(e,i){o+='BEGIN:VEVENT\r\nUID:'+b.id+'-'+i+'@samun\r\nDTSTAMP:'+f(Date.now())+'\r\nDTSTART:'+f(e[1])+'\r\nDTEND:'+f(e[1]+18e5)+'\r\nSUMMARY:🍞 '+e[0]+' – '+b.name.replace(/[,;\n]/g,' ')+'\r\nBEGIN:VALARM\r\nTRIGGER:-PT10M\r\nACTION:DISPLAY\r\nDESCRIPTION:'+e[0]+'\r\nEND:VALARM\r\nEND:VEVENT\r\n'});
+o+='END:VCALENDAR';var u=URL.createObjectURL(new Blob([o],{type:'text/calendar'})),a=document.createElement('a');a.href=u;a.download='samun.ics';document.body.appendChild(a);a.click();a.remove()}
+$('#list').addEventListener('click',function(e){var d=e.target.dataset;if(!d.ics)return;var b=S.breads.find(function(x){return x.id==d.ics});if(b&&b.T)ics(b);else alert('Този хляб няма график.')});
+var TI=null,WL=null,AC=null;
+function beep(){try{AC.resume();var o=AC.createOscillator();o.connect(AC.destination);o.frequency.value=880;o.start();setTimeout(function(){o.stop()},700)}catch(e){}try{navigator.vibrate&&navigator.vibrate([300,100,300])}catch(e){}}
+function tmTick(){var t=S.tm;if(!t){$('#tmo').textContent='—';return}var l=Math.round((t.end-Date.now())/1000);
+if(l<=0){beep();t.n++;if(t.n>=t.total){S.tm=null;save();clearInterval(TI);TI=null;$('#tmo').textContent='✅ Готово!';try{WL&&WL.release()}catch(e){}return}t.end=Date.now()+t.min*6e4;save();l=Math.round(t.min*60)}
+$('#tmo').textContent='Сгъване '+(t.n+1)+' от '+t.total+' · '+Math.floor(l/60)+':'+('0'+l%60).slice(-2)}
+function tmRun(){clearInterval(TI);TI=setInterval(tmTick,1000);tmTick();try{navigator.wakeLock&&navigator.wakeLock.request('screen').then(function(w){WL=w},function(){})}catch(e){}}
+$('#tms').onclick=function(){try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();AC.resume()}catch(e){}var m=n($('#tm1').value)||30;S.tm={end:Date.now()+m*6e4,min:m,total:n($('#tm2').value)||1,n:0};save();tmRun()};
+$('#tmx').onclick=function(){S.tm=null;save();clearInterval(TI);$('#tmo').textContent='—';try{WL&&WL.release()}catch(e){}};
+if(S.tm)tmRun();
+function bkMsg(t){$('#bk-msg').textContent=t}
+$('#bk-ex').onclick=function(){bkMsg('Подготвяне…');
+pAll(null).then(function(photos){
+var pkg={app:'samun',v:1,exported:Date.now(),state:S,photos:photos};
+var blob=new Blob([JSON.stringify(pkg)],{type:'application/json'});
+var u=URL.createObjectURL(blob),a=document.createElement('a');
+a.href=u;a.download='samun-backup-'+new Date().toISOString().slice(0,10)+'.json';
+document.body.appendChild(a);a.click();a.remove();
+setTimeout(function(){URL.revokeObjectURL(u)},4000);
+bkMsg('Готово. Запази файла (Share → Save to Files) и го качи където искаш.')})};
+function bkMergeState(R){var del=Object.assign({},S.del,R.del||{});
+function mg(k,key){var m={};(S[k]||[]).concat(R[k]||[]).forEach(function(x){m[x[key]]=x});return Object.keys(m).map(function(i){return m[i]}).filter(function(x){return!del[x[key]]})}
+S.breads=mg('breads','id').sort(function(x,y){return y.id-x.id});S.starter=mg('starter','d').sort(function(x,y){return y.d-x.d});S.del=del}
+$('#bk-im').onchange=function(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();
+r.onload=async function(){try{var pkg=JSON.parse(r.result);if(!pkg.state)throw 0;
+bkMergeState(pkg.state);save();
+var have={};(await pAll(null)).forEach(function(p){have[p.k]=1});
+for(var p of(pkg.photos||[]))if(!have[p.k])await pDo('put',p);
+render();qr();bkMsg('Възстановено.');e.target.value=''}catch(x){bkMsg('Невалиден файл.')}};
+r.readAsText(f)};
+tcalc();render();qr();
+</script>
+</body>
+</html>
