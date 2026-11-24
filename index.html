@@ -96,7 +96,29 @@ td{padding:6px 4px;border-bottom:1px dashed var(--bd)}
 <div id="xs"></div>
 <button class="g" id="ax" style="margin-top:6px">+ Стъпка</button>
 
-<label>Бележки и стъпки на рецептата</label><textarea id="rn" rows="3"></textarea>
+<div class="c" style="margin-top:14px; border: 2px solid var(--ac);">
+<h2>🔥 Печене</h2>
+<div class="g2">
+    <div><label>Темп. (°C)</label><input id="bk-temp" type="number" value="250"></div>
+    <div><label>Съд</label><select id="bk-vessel">
+        <option>Тенджера с капак</option>
+        <option>Тенджера без капак</option>
+        <option>На тава свободно</option>
+    </select></div>
+    <div><label>Пара</label><select id="bk-steam">
+        <option>С пара</option>
+        <option>Без пара</option>
+    </select></div>
+    <div><label>Вентилатор</label><select id="bk-fan">
+        <option>Без вентилатор</option>
+        <option>С вентилатор</option>
+    </select></div>
+    <div><label>Време 1 (мин)</label><input id="bk-time1" type="number" value="20" placeholder="напр. с капак"></div>
+    <div><label>Време 2 (мин)</label><input id="bk-time2" type="number" value="25" placeholder="напр. без капак"></div>
+</div>
+</div>
+
+<label style="margin-top:10px">Бележки и стъпки на рецептата</label><textarea id="rn" rows="3"></textarea>
 <button id="sv" style="margin-top:10px">Запази хляба</button>
 <button class="g" id="sr" style="margin-top:8px">📖 Запази като рецепта</button></div>
 <div id="list"></div>
@@ -225,6 +247,47 @@ function save(){try{localStorage.setItem('samun',JSON.stringify(S))}catch(e){}}
 var $=function(s){return document.querySelector(s)},n=function(v){return parseFloat(v)||0};
 var esc=function(s){return String(s).replace(/[&<>]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;'}[c]})};
 var fmt=function(d){return new Date(d).toLocaleString('bg-BG',{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})};
+
+function formatTimeMins(mins) {
+    if (isNaN(mins) || mins < 0) return '0 мин';
+    var h = Math.floor(mins / 60);
+    var m = Math.round(mins % 60);
+    return (h > 0 ? h + ' ч ' : '') + m + ' мин';
+}
+
+function calcTotalTime(xs, bake) {
+    var firstMins = null;
+    var lastMins = null;
+    var prevMins = null;
+    
+    if (xs && xs.length) {
+        xs.forEach(function(x) {
+            if (!x.t) return;
+            var parts = x.t.split(':');
+            if (parts.length < 2) return;
+            var currentMins = parseInt(parts[0])*60 + parseInt(parts[1]);
+            
+            if (firstMins === null) firstMins = currentMins;
+            if (prevMins !== null && currentMins < prevMins) currentMins += 24*60;
+            
+            lastMins = currentMins;
+            prevMins = currentMins;
+        });
+    }
+    
+    var bakeMins = 0;
+    if (bake) {
+        bakeMins = (parseFloat(bake.t1) || 0) + (parseFloat(bake.t2) || 0);
+    }
+    
+    if (firstMins !== null && lastMins !== null) {
+        return (lastMins + bakeMins) - firstMins;
+    } else if (bakeMins > 0) {
+        return bakeMins;
+    }
+    return 0;
+}
+
 document.querySelectorAll('nav button').forEach(function(b){b.onclick=function(){
 document.querySelectorAll('nav button,section').forEach(function(e){e.classList.remove('on')});
 b.classList.add('on');$('#t-'+b.dataset.t).classList.add('on');if(b.dataset.t==='m')shop();if(b.dataset.t==='st')stats();if(b.dataset.t==='s')qch()}});
@@ -334,14 +397,65 @@ return o}
 
 $('#sv').onclick=function(){var o=calc();if(!o.fl.length||!o.w){alert('Добави брашно и вода.');return}
 o.id=Date.now();o.name=$('#nm').value.trim()||'Хляб от '+new Date().toLocaleDateString('bg-BG');
-o.xs=getXs();o.rating=0;o.notes='';S.breads.unshift(o);save();render();$('#nm').value=''};
+o.xs=getXs();o.rating=0;o.notes='';
+o.bake = {
+    temp: $('#bk-temp').value || '250',
+    vessel: $('#bk-vessel').value || 'Тенджера с капак',
+    steam: $('#bk-steam').value || 'С пара',
+    fan: $('#bk-fan').value || 'Без вентилатор',
+    t1: parseFloat($('#bk-time1').value) || 0,
+    t2: parseFloat($('#bk-time2').value) || 0
+};
+S.breads.unshift(o);save();render();$('#nm').value=''};
 
-function render(){$('#list').innerHTML=S.breads.map(function(b){
+function render(){
+$('#list').innerHTML=S.breads.map(function(b){
 var st='';for(var i=1;i<=10;i++)st+='<option'+(b.rating==i?' selected':'')+'>'+i+'</option>';
+var stepsHtml = '';
+if(b.xs && b.xs.length){
+    var prev = null;
+    b.xs.forEach(function(x){
+        if(!x.t) return;
+        var p = x.t.split(':');
+        if(p.length < 2) return;
+        var curr = parseInt(p[0])*60 + parseInt(p[1]);
+        if(prev !== null && curr < prev) curr += 24*60;
+        
+        var diffTxt = '';
+        if(prev !== null){
+            var diff = curr - prev;
+            diffTxt = ' <span class="mu">(след ' + formatTimeMins(diff) + ')</span>';
+        }
+        stepsHtml += '<div style="padding:3px 0;">🕒 <b>' + x.t + '</b> – ' + esc(x.n) + diffTxt + '</div>';
+        prev = curr;
+    });
+}
+var bakeHtml = '';
+if(b.bake){
+    var t1 = parseFloat(b.bake.t1) || 0;
+    var t2 = parseFloat(b.bake.t2) || 0;
+    bakeHtml = '<div style="margin-top:10px; padding:10px; background:var(--bg); border-radius:8px; font-size:13px;">';
+    bakeHtml += '<b>🔥 Печене:</b><br>';
+    bakeHtml += '🌡️ ' + b.bake.temp + '°C | 🍲 ' + esc(b.bake.vessel) + '<br>';
+    bakeHtml += '💨 ' + esc(b.bake.steam) + ' | 🌀 ' + esc(b.bake.fan) + '<br>';
+    if(t1 > 0 || t2 > 0) {
+        bakeHtml += '⏱️ ';
+        if(t1 > 0 && t2 > 0) bakeHtml += t1 + ' мин с капак + ' + t2 + ' мин без капак';
+        else if(t1 > 0) bakeHtml += t1 + ' мин с капак';
+        else if(t2 > 0) bakeHtml += t2 + ' мин без капак';
+    }
+    bakeHtml += '</div>';
+}
+var totalMins = calcTotalTime(b.xs, b.bake);
+var totalHtml = totalMins > 0 ? '<div style="margin-top:10px; font-weight:bold; font-size:14px; color:var(--ac);">⌛ Общо време за приготвяне: ' + formatTimeMins(totalMins) + '</div>' : '';
+
 return '<div class="c"><details><summary>'+esc(b.name)+' · '+b.hyd.toFixed(0)+'%'+(b.rating?' · ★'+b.rating:'')+'</summary>'
 +'<div class="mu">'+b.fl.map(function(f){return esc(f.n||'брашно')+' '+f.g+' г'}).join(', ')+'; вода '+b.w+' г; квас '+b.s+' г; сол '+b.sa+' г</div>'
-+(b.ex&&b.ex.length?'<div class="mu">Добавки: '+b.ex.map(function(x){return esc(x.n||'добавка')+' '+x.g+' г'}).join(', ')+'</div>':'')+(b.xs&&b.xs.length?'<div class="mu">Стъпки: '+b.xs.map(function(x){return esc(x.n||'стъпка')+(x.t?' в '+x.t:'')}).join(', ')+'</div>':'')
-+'<label>Оценка (0–10)</label><select data-id="'+b.id+'" data-f="rating"><option>0</option>'+st+'</select>'
++(b.ex&&b.ex.length?'<div class="mu">Добавки: '+b.ex.map(function(x){return esc(x.n||'добавка')+' '+x.g+' г'}).join(', ')+'</div>':'')
++ (stepsHtml ? '<div style="margin-top:12px;"><b>Стъпки:</b>' + stepsHtml + '</div>' : '')
++ bakeHtml
++ totalHtml
++'<label style="margin-top:12px">Оценка (0–10)</label><select data-id="'+b.id+'" data-f="rating"><option>0</option>'+st+'</select>'
 +'<div class="g2">'+['Коричка','Среда','Вкус','Аромат'].map(function(c,i){var o='<option>—</option>';for(var j=1;j<=5;j++)o+='<option'+(b['c'+i]==j?' selected':'')+'>'+j+'</option>';return '<div><label>'+c+' (1–5)</label><select data-id="'+b.id+'" data-f="c'+i+'">'+o+'</select></div>'}).join('')+'</div>'
 +'<label>Снимки (до 3)</label><input type="file" accept="image/*" multiple data-ph="'+b.id+'"><div class="phs" id="ph-'+b.id+'"></div>'
 +'<label>Бележки</label><textarea rows="3" data-id="'+b.id+'" data-f="notes">'+esc(b.notes)+'</textarea>'
@@ -349,15 +463,32 @@ return '<div class="c"><details><summary>'+esc(b.name)+' · '+b.hyd.toFixed(0)+'
 $('#list').onchange=function(e){var t=e.target,b=S.breads.find(function(x){return x.id==t.dataset.id});if(b){b[t.dataset.f]=t.dataset.f==='rating'?n(t.value):t.value;save();if(t.dataset.f==='rating')render()}};
 $('#list').onclick=function(e){var d=e.target.dataset;
 if(d.del&&confirm('Да изтрия ли хляба?')){S.del[d.del]=1;S.breads=S.breads.filter(function(x){return x.id!=d.del});save();render()}
-if(d.cp){var b=S.breads.find(function(x){return x.id==d.cp});fill(b.fl,b.w,b.s,b.sa,b.sh,b.ex,b.xs);$('#nm').value=b.name;window.scrollTo(0,0)}};
-function fill(fl,w,s,sa,sh,ex,xs){
+if(d.cp){var b=S.breads.find(function(x){return x.id==d.cp});fill(b.fl,b.w,b.s,b.sa,b.sh,b.ex,b.xs,b.bake);$('#nm').value=b.name;window.scrollTo(0,0)}};
+function fill(fl,w,s,sa,sh,ex,xs,bake){
   if(window.inMode['w'] !== 'g') document.getElementById('toggle-w').click();
   if(window.inMode['s'] !== 'g') document.getElementById('toggle-s').click();
   if(window.inMode['sa'] !== 'g') document.getElementById('toggle-sa').click();
   $('#ex').innerHTML='';(ex||[]).forEach(function(x){addE(x.n,x.g)});
   $('#xs').innerHTML='';(xs||[]).forEach(function(x){addX(x.n,x.t)});
   $('#fl').innerHTML='';fl.forEach(function(f){addF(f.n,f.g)});
-  $('#w').value=w;$('#s').value=s;$('#sa').value=sa;$('#sh').value=sh;calc();
+  $('#w').value=w;$('#s').value=s;$('#sa').value=sa;$('#sh').value=sh;
+  
+  if(bake){
+      $('#bk-temp').value = bake.temp || '250';
+      $('#bk-vessel').value = bake.vessel || 'Тенджера с капак';
+      $('#bk-steam').value = bake.steam || 'С пара';
+      $('#bk-fan').value = bake.fan || 'Без вентилатор';
+      $('#bk-time1').value = bake.t1 || '20';
+      $('#bk-time2').value = bake.t2 || '25';
+  } else {
+      $('#bk-temp').value = '250';
+      $('#bk-vessel').value = 'Тенджера с капак';
+      $('#bk-steam').value = 'С пара';
+      $('#bk-fan').value = 'Без вентилатор';
+      $('#bk-time1').value = '20';
+      $('#bk-time2').value = '25';
+  }
+  calc();
 }
 
 function kcalc(){var W=n($('#k1').value),L=n($('#k2').value)||1,h=n($('#k3').value)/100,st=n($('#k4').value)/100,sl=n($('#k5').value)/100,wg=n($('#k6').value)/100,sh=n($('#k7').value)/100;
@@ -365,7 +496,7 @@ var F=W/(1+h+sl),s=F*st,sf=s/(1+sh),fresh=F-sf,fw=F*h-(s-sf),whole=fresh*wg,whit
 var o={white:white*L,whole:whole*L,w:fw*L,s:s*L,sa:salt*L};window.K=o;
 $('#ko').innerHTML=fw>0?'Бяло брашно: <b>'+Math.round(o.white)+' г</b><br>Пълнозърнесто: <b>'+Math.round(o.whole)+' г</b><br>Вода: <b>'+Math.round(o.w)+' г</b><br>Квас: <b>'+Math.round(o.s)+' г</b><br>Сол: <b>'+o.sa.toFixed(1)+' г</b>':'Хидратацията е твърде ниска за този % квас.'}
 for(var i=1;i<=7;i++)$('#k'+i).oninput=kcalc;
-$('#kb').onclick=function(){kcalc();var K=window.K;fill([{n:'Бяло',g:Math.round(K.white)},{n:'Пълнозърнесто',g:Math.round(K.whole)}],Math.round(K.w),Math.round(K.s),+K.sa.toFixed(1),n($('#k7').value)*100/100);
+$('#kb').onclick=function(){kcalc();var K=window.K;fill([{n:'Бяло',g:Math.round(K.white)},{n:'Пълнозърнесто',g:Math.round(K.whole)}],Math.round(K.w),Math.round(K.s),+K.sa.toFixed(1),n($('#k7').value)*100/100, [], []);
 document.querySelector('nav button[data-t=b]').click();window.scrollTo(0,0)};
 
 function tcalc(){var T=n($('#t1').value),st=n($('#t2').value)||1;var h=5*Math.pow(2,(24-T)/5)*Math.pow(20/st,0.6);window.H=h;
@@ -450,7 +581,6 @@ function ics(b){
     var o='BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Samun//BG\r\n';
     var baseDate = new Date();
     function f(t){return t.toISOString().replace(/[-:]/g,'').slice(0,15)+'Z'}
-    
     if(b.xs && b.xs.length) {
         b.xs.forEach(function(x, i){
             if(!x.t) return;
@@ -603,11 +733,49 @@ $('#do').innerHTML=h;window.DT=D}
 ['d1','d2','d3','d4','d5','d6'].forEach(function(i){$('#'+i).oninput=dcalc});
 $('#db').onclick=function(){$('#t1').value=window.DT;tcalc()};dcalc();
 function mergeRec(a){var m={};S.recipes.concat(a||[]).forEach(function(r){m[r.id]=r});S.recipes=Object.keys(m).map(function(k){return m[k]}).filter(function(r){return!S.del[r.id]}).sort(function(x,y){return y.id-x.id})}
-function recRender(){$('#rec').innerHTML=S.recipes.length?'<div class="c"><h2>📖 Рецепти</h2>'+S.recipes.map(function(r){return '<details><summary>'+esc(r.name)+' · '+r.hyd.toFixed(0)+'%</summary><div class="mu">'+r.fl.map(function(f){return esc(f.n||'брашно')+' '+f.g+' г'}).join(', ')+'; вода '+r.w+' г; квас '+r.s+' г; сол '+r.sa+' г'+((r.ex||[]).length?'; '+r.ex.map(function(x){return esc(x.n||'добавка')+' '+x.g+' г'}).join(', '):'')+'</div>'+(r.notes?'<div style="white-space:pre-wrap;margin-top:6px">'+esc(r.notes)+'</div>':'')+'<div class="row"><button data-ru="'+r.id+'">Нов хляб</button><button class="g" data-rd="'+r.id+'">Изтрий</button></div></details>'}).join('')+'</div>':''}
+function recRender(){
+$('#rec').innerHTML=S.recipes.length?'<div class="c"><h2>📖 Рецепти</h2>'+S.recipes.map(function(r){
+    var stepsHtml = '';
+    if(r.xs && r.xs.length){
+        var prev = null;
+        r.xs.forEach(function(x){
+            if(!x.t) return;
+            var p = x.t.split(':');
+            var curr = parseInt(p[0])*60 + parseInt(p[1]);
+            if(prev !== null && curr < prev) curr += 24*60;
+            var diffTxt = '';
+            if(prev !== null) diffTxt = ' <span class="mu">(след ' + formatTimeMins(curr - prev) + ')</span>';
+            stepsHtml += '<div style="padding:2px 0; font-size:13px;">🕒 <b>' + x.t + '</b> – ' + esc(x.n) + diffTxt + '</div>';
+            prev = curr;
+        });
+    }
+    var bakeHtml = '';
+    if(r.bake){
+        bakeHtml = '<div style="margin-top:6px; font-size:13px; color:var(--mu);">🔥 ' + (r.bake.temp||'') + '°C | ' + esc(r.bake.vessel||'') + ' | ' + esc(r.bake.steam||'') + ' | ' + esc(r.bake.fan||'') + '</div>';
+    }
+    
+    var totalMins = calcTotalTime(r.xs, r.bake);
+    var totalHtml = totalMins > 0 ? '<div style="margin-top:4px; font-size:13px; font-weight:bold;">⌛ Общо: ' + formatTimeMins(totalMins) + '</div>' : '';
+
+    return '<details><summary>'+esc(r.name)+' · '+r.hyd.toFixed(0)+'%</summary><div class="mu">'+r.fl.map(function(f){return esc(f.n||'брашно')+' '+f.g+' г'}).join(', ')+'; вода '+r.w+' г; квас '+r.s+' г; сол '+r.sa+' г'+((r.ex||[]).length?'; '+r.ex.map(function(x){return esc(x.n||'добавка')+' '+x.g+' г'}).join(', '):'')+'</div>'
+    + (stepsHtml ? '<div style="margin-top:8px;">'+stepsHtml+'</div>' : '') 
+    + bakeHtml 
+    + totalHtml 
+    + (r.notes?'<div style="white-space:pre-wrap;margin-top:6px">'+esc(r.notes)+'</div>':'')+'<div class="row"><button data-ru="'+r.id+'">Нов хляб</button><button class="g" data-rd="'+r.id+'">Изтрий</button></div></details>'
+}).join('')+'</div>':'';
+}
 $('#sr').onclick=function(){var o=calc();if(!o.fl.length||!o.w){alert('Добави брашно и вода.');return}
-S.recipes.unshift({id:Date.now(),name:$('#nm').value.trim()||'Рецепта',fl:o.fl,ex:o.ex,w:o.w,s:o.s,sa:o.sa,sh:o.sh,hyd:o.hyd,xs:getXs(),notes:$('#rn').value.trim()});save();recRender()};
+o.bake = {
+    temp: $('#bk-temp').value || '250',
+    vessel: $('#bk-vessel').value || 'Тенджера с капак',
+    steam: $('#bk-steam').value || 'С пара',
+    fan: $('#bk-fan').value || 'Без вентилатор',
+    t1: parseFloat($('#bk-time1').value) || 0,
+    t2: parseFloat($('#bk-time2').value) || 0
+};
+S.recipes.unshift({id:Date.now(),name:$('#nm').value.trim()||'Рецепта',fl:o.fl,ex:o.ex,w:o.w,s:o.s,sa:o.sa,sh:o.sh,hyd:o.hyd,xs:getXs(),bake:o.bake,notes:$('#rn').value.trim()});save();recRender()};
 $('#rec').addEventListener('click',function(e){var d=e.target.dataset,r;
-if(d.ru){r=S.recipes.find(function(x){return x.id==d.ru});if(r){fill(r.fl,r.w,r.s,r.sa,r.sh,r.ex,r.xs);$('#nm').value=r.name;$('#rn').value=r.notes||'';window.scrollTo(0,0)}}
+if(d.ru){r=S.recipes.find(function(x){return x.id==d.ru});if(r){fill(r.fl,r.w,r.s,r.sa,r.sh,r.ex,r.xs,r.bake);$('#nm').value=r.name;$('#rn').value=r.notes||'';window.scrollTo(0,0)}}
 if(d.rd&&confirm('Да изтрия ли рецептата?')){S.del[d.rd]=1;S.recipes=S.recipes.filter(function(x){return x.id!=d.rd});save();recRender()}});
 function gSteps(){
   var L = getXs();
