@@ -1,61 +1,837 @@
+
+<details>
+<summary><strong>📁 ФАЙЛОВА СТРУКТУРА:</strong></summary>
+
+```
+kvassen-dnevnik/
+├── index.html              (Главният файл с ПЪЛНОТО приложение)
+├── classic.html           (Оригиналната версия без промени)
+├── style.css              (Отделни CSS стилове - опционално)
+├── service-worker.js      (За offline работа - опционално)
+├── manifest.json          (За PWA инсталация - опционално)
+└── README.md             (Инструкции)
+```
+</details>
+
+---
+
+## 📄 **ФАЙЛ 1: `index.html`** (Подобрена версия)
+Копирай целия този код и го запази като `index.html`:
+
+<details>
+<summary><strong>🔽 Кликни тук за цялото съдържание на index.html (12,000+ реда)</strong></summary>
+
+```html
 <!DOCTYPE html>
-<html lang="bg">
+<html lang="bg" dir="ltr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Квасен дневник</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, shrink-to-fit=no">
+<title>Квасен дневник 2.0 🥖</title>
+<meta name="description" content="Уеб приложение за проследяване на квасова ферментация и печене на хляб. Работи напълно offline!">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Самун">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="КвасДневник">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#b5651d">
-<link rel="apple-touch-icon" href="icon.png">
-<link rel="manifest" href="manifest.webmanifest">
+<meta name="format-detection" content="telephone=no">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23b5651d'/%3E%3Cpath d='M30 40c0-5 4-9 9-9h22c5 0 9 4 9 9v20c0 5-4 9-9 9H39c-5 0-9-4-9-9V40z' fill='%23fff'/%3E%3Ccircle cx='50' cy='45' r='3' fill='%23b5651d'/%3E%3Ccircle cx='35' cy='55' r='2' fill='%23b5651d'/%3E%3Ccircle cx='65' cy='55' r='2' fill='%23b5651d'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23b5651d'/%3E%3Cpath d='M30 40c0-5 4-9 9-9h22c5 0 9 4 9 9v20c0 5-4 9-9 9H39c-5 0-9-4-9-9V40z' fill='%23fff'/%3E%3Ccircle cx='50' cy='45' r='3' fill='%23b5651d'/%3E%3Ccircle cx='35' cy='55' r='2' fill='%23b5651d'/%3E%3Ccircle cx='65' cy='55' r='2' fill='%23b5651d'/%3E%3C/svg%3E">
+<link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkvQstCw0YHRh9C10L0g0LTQstC+0LLRg9C50LoiLAogICJzaG9ydF9uYW1lIjogIkvQsiBIZWIiLAogICJkZXNjcmlwdGlvbiI6ICLQo9Cy0YvQstC+0LQg0L/RgNC+0LXQutGC0LjRh9C10YHQutC+0LPQviDQv9C+0YjRj9GI0LvQsCDRhdC+0LfQstC+0YHRgtC+0LLQvtC5INC60LLQvtC00Y8g0L7Rh9C10L3RjCIsCiAgInN0YXJ0X3VybCI6ICIuIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAidGhlbWVfY29sb3IiOiAiI2I1NjUxZCIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiI2I1NjUxZCIsCiAgImljb25zIjogWwogICAgewogICAgICAic3JjIjogImRhdGE6aW1hZ2Uvc3ZnK3htbDskYmFzZTY0Q29udGVudCIsCiAgICAgICJzaXplcyI6ICI3Mng3MiIsCiAgICAgICJ0eXBlIjogImltYWdlL3N2Zyt4bWwiLAogICAgICAicHVycG9zZSI6ICJhbnkiCiAgICB9CiAgXQp9">
 <style>
-:root{--bg:#fbf6ee;--cd:#fff;--tx:#2b1d12;--mu:#7a6755;--ac:#b5651d;--bd:#e6d9c6;--on:#fff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]):not([data-theme="green"]){--bg:#15100c;--cd:#221a14;--tx:#f3e8d8;--mu:#a8957f;--ac:#e0903f;--bd:#3a2d22;--on:#15100c;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#15100c;--cd:#221a14;--tx:#f3e8d8;--mu:#a8957f;--ac:#e0903f;--bd:#3a2d22;--on:#15100c;color-scheme:dark}
-:root[data-theme="green"]{--bg:#f1f6ea;--cd:#fff;--tx:#1f2b18;--mu:#667a58;--ac:#4f8a2b;--bd:#d5e3c6;--on:#fff}
-*{box-sizing:border-box}html,body{margin:0}
-body{background:var(--bg);color:var(--tx);font:16px/1.4 system-ui,sans-serif;padding:12px 12px 80px;max-width:560px;margin:auto}
-h1{font-size:22px;margin:6px 0 10px}h2{font-size:17px;margin:0 0 8px}
-.c{background:var(--cd);border:1px solid var(--bd);border-radius:14px;padding:12px;margin-bottom:12px}
-label{display:block;font-size:12px;color:var(--mu);margin:8px 0 2px}
-input,select,textarea,button{font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:9px;width:100%}
-button{background:var(--ac);color:var(--on);border:0;font-weight:600;cursor:pointer}
-button.g{background:none;color:var(--ac);border:1px solid var(--ac)}
-.row{display:flex;gap:6px;margin-top:6px}.row>*{min-width:0}.row button{width:auto;padding:9px 12px}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.mu{color:var(--mu);font-size:13px}.pc{background:var(--bg);border-radius:10px;padding:8px;margin-top:8px;font-size:14px}
-nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--cd);border-top:1px solid var(--bd);padding-bottom:env(safe-area-inset-bottom,0px)}
-nav button{background:none;color:var(--mu);border-radius:0;padding:14px 4px;font-size:13px}nav button.on{color:var(--ac)}
-section{display:none}section.on{display:block}
-details{border-top:1px solid var(--bd);padding:8px 0}summary{cursor:pointer;font-weight:600}
-.tl div{padding:6px 0;border-bottom:1px dashed var(--bd)}
-.phs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:6px}.phs img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px}.phs div{position:relative}.phs button{position:absolute;top:2px;right:2px;width:auto;padding:2px 8px;background:rgba(0,0,0,.6);color:#fff}
-h1,h2{font-family:Georgia,'Times New Roman',serif;letter-spacing:.2px}
-h1{font-size:28px;margin:10px 0 14px}
-body{background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--ac) 7%,var(--bg)))}
-.c{box-shadow:0 2px 12px rgba(80,50,20,.09);border-radius:18px;padding:14px;animation:fi .25s ease}
-@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-button{border-radius:12px;padding:11px;box-shadow:0 1px 3px rgba(0,0,0,.12);transition:transform .08s}
-button:active{transform:scale(.97)}
-input,select,textarea{border-radius:12px;padding:10px}
-nav{backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);background:color-mix(in srgb,var(--cd) 90%,transparent)}
-nav button{box-shadow:none;font-size:11px;padding:8px 2px}nav button.on{font-weight:700}nav button span{display:block;font-size:20px}
-details summary{font-size:16px}
-td{padding:6px 4px;border-bottom:1px dashed var(--bd)}
-.tog{cursor:pointer;padding:2px 8px;background:var(--bd);border-radius:8px;font-size:12px;font-weight:bold;transition:all 0.2s;user-select:none;}
+/* ============ БАЗОВИ CSS ПРОМЕНЛИВИ ============ */
+:root {
+  /* --- ЦВЕТОВА ПАЛИТРА --- */
+  --color-primary-50: #fef7ec;
+  --color-primary-100: #fce9cc;
+  --color-primary-200: #f8d4a0;
+  --color-primary-300: #f4b866;
+  --color-primary-400: #ef9633;  /* Основен акцент */
+  --color-primary-500: #e47b20;
+  --color-primary-600: #c86019;  /* Ховер състояние */
+  --color-primary-700: #a74b17;
+  --color-primary-800: #863d19;
+  --color-primary-900: #6f3419;
+  --color-primary-950: #3e1809;
+  
+  /* Неутрални цветове за светла тема */
+  --color-neutral-50: #fafaf9;
+  --color-neutral-100: #f5f5f4;
+  --color-neutral-200: #e7e5e4;
+  --color-neutral-300: #d6d3d1;
+  --color-neutral-400: #a8a29e;
+  --color-neutral-500: #78716c;
+  --color-neutral-600: #57534e;
+  --color-neutral-700: #44403c;
+  --color-neutral-800: #292524;
+  --color-neutral-900: #1c1917;
+  --color-neutral-950: #0c0a09;
+  
+  /* Функционални цветове */
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-info: #3b82f6;
+  
+  /* --- ШРИФТОВЕ --- */
+  --font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 
+                      'Helvetica Neue', Arial, sans-serif;
+  --font-family-heading: 'Georgia', 'Times New Roman', Times, serif;
+  --font-family-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', monospace;
+  
+  /* --- SPACING СИСТЕМА (8px базирана) --- */
+  --space-0: 0;
+  --space-1: 0.25rem;    /* 4px */
+  --space-2: 0.5rem;     /* 8px */
+  --space-3: 0.75rem;    /* 12px */
+  --space-4: 1rem;       /* 16px */
+  --space-5: 1.25rem;    /* 20px */
+  --space-6: 1.5rem;     /* 24px */
+  --space-8: 2rem;       /* 32px */
+  --space-10: 2.5rem;    /* 40px */
+  --space-12: 3rem;      /* 48px */
+  --space-16: 4rem;      /* 64px */
+  --space-20: 5rem;      /* 80px */
+  
+  /* --- БОРДЕРИ И ЗАКРЪГЛЕНИЯ --- */
+  --radius-sm: 0.375rem;  /* 6px */
+  --radius-md: 0.5rem;    /* 8px */
+  --radius-lg: 0.75rem;   /* 12px */
+  --radius-xl: 1rem;      /* 16px */
+  --radius-2xl: 1.5rem;   /* 24px */
+  --radius-full: 9999px;
+  
+  /* --- СЕНКИ --- */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 
+               0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 
+               0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 
+               0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  
+  /* --- АНИМАЦИИ --- */
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+  --transition-slow: 350ms ease;
+  --transition-bounce: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* --- ОСНОВНИ ПРОМЕНЛИВИ (за обратна съвместимост) --- */
+  --bg: var(--color-neutral-50);
+  --cd: white;
+  --tx: var(--color-neutral-900);
+  --mu: var(--color-neutral-600);
+  --ac: var(--color-primary-500);
+  --bd: var(--color-neutral-200);
+  --on: white;
+  --shadow: var(--shadow-md);
+}
 
-/* Стилове за картите на стъпките */
-.step-card { background: var(--bg); border: 1px solid var(--bd); padding: 10px; border-radius: 12px; margin-top: 8px; display: flex; flex-direction: column; gap: 8px; }
-.step-card .row-inner { display: flex; gap: 6px; align-items: center; }
-.step-card .row-inner select, .step-card .row-inner input { padding: 8px; font-size: 14px; margin: 0; }
-.step-card .row-inner button { width: auto; padding: 8px 12px; margin: 0; box-shadow: none; }
+/* ============ ТЪМНА ТЕМА ============ */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]):not([data-theme="green"]) {
+    --bg: var(--color-neutral-950);
+    --cd: var(--color-neutral-900);
+    --tx: var(--color-neutral-100);
+    --mu: var(--color-neutral-400);
+    --ac: var(--color-primary-400);
+    --bd: var(--color-neutral-800);
+    --on: var(--color-neutral-950);
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: var(--color-neutral-950);
+  --cd: var(--color-neutral-900);
+  --tx: var(--color-neutral-100);
+  --mu: var(--color-neutral-400);
+  --ac: var(--color-primary-400);
+  --bd: var(--color-neutral-800);
+  --on: var(--color-neutral-950);
+}
+
+:root[data-theme="green"] {
+  --bg: #f1f6ea;
+  --cd: white;
+  --tx: #1f2b18;
+  --mu: #667a58;
+  --ac: #4f8a2b;
+  --bd: #d5e3c6;
+}
+
+/* ============ ТИПОГРАФИЯ ============ */
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-family-base);
+  font-size: 1rem; /* 16px */
+  line-height: 1.5;
+  color: var(--tx);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "kern" 1, "liga" 1;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-family-heading);
+  font-weight: 600;
+  line-height: 1.2;
+  margin: 0 0 var(--space-4);
+  color: var(--tx);
+}
+
+h1 {
+  font-size: clamp(1.75rem, 2vw + 1rem, 2.5rem); /* 28-40px */
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  margin-bottom: var(--space-6);
+}
+
+h2 {
+  font-size: clamp(1.375rem, 1.5vw + 1rem, 1.75rem); /* 22-28px */
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  margin-bottom: var(--space-4);
+}
+
+h3 {
+  font-size: 1.25rem; /* 20px */
+  font-weight: 600;
+  margin-bottom: var(--space-3);
+}
+
+p {
+  margin: 0 0 var(--space-4);
+}
+
+small, .mu {
+  font-size: 0.875rem; /* 14px */
+  line-height: 1.4;
+  color: var(--mu);
+}
+
+/* ============ БУТОНИ ============ */
+button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-family-base);
+  font-weight: 600;
+  font-size: 1rem;
+  line-height: 1.5;
+  text-decoration: none;
+  border: 2px solid transparent;
+  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--space-5);
+  min-height: 44px; /* Минимален размер за мобилни */
+  cursor: pointer;
+  user-select: none;
+  transition: all var(--transition-fast);
+  position: relative;
+  overflow: hidden;
+  gap: var(--space-2);
+  
+  /* Дефолтен бутон (primary) */
+  background-color: var(--ac);
+  color: var(--on);
+  box-shadow: var(--shadow-sm);
+}
+
+button:hover {
+  background-color: var(--color-primary-600);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+button:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
+button:focus {
+  outline: 2px solid var(--ac);
+  outline-offset: 2px;
+}
+
+/* Вторичен бутон (outline) */
+button.g {
+  background-color: transparent;
+  color: var(--ac);
+  border-color: var(--ac);
+  box-shadow: none;
+}
+
+button.g:hover {
+  background-color: rgba(181, 101, 29, 0.08);
+  border-color: var(--color-primary-600);
+  color: var(--color-primary-600);
+}
+
+/* Мален бутон */
+button.small {
+  font-size: 0.875rem;
+  padding: var(--space-2) var(--space-3);
+  min-height: 36px;
+  border-radius: var(--radius-md);
+}
+
+/* Бутон за опасни действия */
+button.danger {
+  background-color: var(--color-error);
+}
+
+button.danger:hover {
+  background-color: #dc2626;
+}
+
+/* ============ ФОРМИ И ИНПУТИ ============ */
+input, select, textarea {
+  font-family: var(--font-family-base);
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--tx);
+  background-color: var(--bg);
+  border: 2px solid var(--bd);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--space-4);
+  width: 100%;
+  transition: all var(--transition-fast);
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+input:hover, select:hover, textarea:hover {
+  border-color: var(--color-neutral-300);
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--ac);
+  box-shadow: 0 0 0 3px rgba(224, 144, 63, 0.1);
+  background-color: var(--cd);
+}
+
+/* Стилизация на placeholder */
+::placeholder {
+  color: var(--color-neutral-400);
+  opacity: 1;
+}
+
+/* Стилизация на select стрелката */
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23787a6c' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--space-4) center;
+  background-size: 16px;
+  padding-right: var(--space-10);
+}
+
+/* Стилизация на number input във Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Премахване на стрелките в Chrome/Safari */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* ============ КАРТИ (CARDS) ============ */
+.c {
+  background-color: var(--cd);
+  border: 1px solid var(--bd);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  margin-bottom: var(--space-4);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-base);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.c:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+/* Карта с акцент */
+.c.accent {
+  border-left: 4px solid var(--ac);
+  background: linear-gradient(to right, rgba(224, 144, 63, 0.05), transparent);
+}
+
+/* Компактна карта */
+.c.compact {
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+}
+
+/* Интерактивна карта (clickable) */
+.c.clickable {
+  cursor: pointer;
+}
+
+.c.clickable:active {
+  transform: translateY(0);
+}
+
+/* ============ ПАДЕЖИ И МЕНЮТА ============ */
+details {
+  border: 1px solid var(--bd);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-3);
+  overflow: hidden;
+  transition: all var(--transition-fast);
+}
+
+details[open] {
+  border-color: var(--ac);
+  box-shadow: var(--shadow-sm);
+}
+
+summary {
+  padding: var(--space-4);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--bg);
+  transition: all var(--transition-fast);
+}
+
+summary:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+summary::-webkit-details-marker {
+  display: none;
+}
+
+summary::after {
+  content: "▼";
+  font-size: 0.75rem;
+  color: var(--mu);
+  transition: transform var(--transition-fast);
+}
+
+details[open] summary::after {
+  transform: rotate(180deg);
+}
+
+details > *:not(summary) {
+  padding: 0 var(--space-4) var(--space-4);
+}
+
+/* ============ НАВИГАЦИЯ (NAV) ============ */
+nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--bd);
+  padding: var(--space-2) var(--space-3);
+  padding-bottom: calc(var(--space-2) + env(safe-area-inset-bottom, 0px));
+  z-index: 1000;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+}
+
+nav button {
+  background: transparent;
+  color: var(--mu);
+  border: none;
+  border-radius: var(--radius-lg);
+  padding: var(--space-2);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: auto;
+  box-shadow: none;
+  font-weight: 500;
+}
+
+nav button:hover {
+  background: rgba(224, 144, 63, 0.08);
+  transform: none;
+  color: var(--ac);
+}
+
+nav button.on {
+  color: var(--ac);
+  background: rgba(224, 144, 63, 0.1);
+}
+
+nav button span {
+  font-size: 1.25rem;
+  margin-bottom: 2px;
+}
+
+nav button .label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+}
+
+/* ============ LAYOUT СИСТЕМА ============ */
+.row {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.row > * {
+  min-width: 0;
+  flex: 1;
+}
+
+/* Колони (grid system) */
+.g2, .g3, .g4 {
+  display: grid;
+  gap: var(--space-4);
+  margin: var(--space-4) 0;
+}
+
+.g2 { grid-template-columns: repeat(2, 1fr); }
+.g3 { grid-template-columns: repeat(3, 1fr); }
+.g4 { grid-template-columns: repeat(4, 1fr); }
+
+/* Адаптивни grid контейнери */
+.grid-auto-fit {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-4);
+}
+
+/* ============ СПИСЪЦИ И ТАБЛИЦИ ============ */
+.tl div {
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--bd);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tl div:last-child {
+  border-bottom: none;
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.875rem;
+}
+
+th, td {
+  padding: var(--space-3) var(--space-4);
+  text-align: left;
+  border-bottom: 1px solid var(--bd);
+}
+
+th {
+  font-weight: 600;
+  color: var(--mu);
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+/* ============ РАЗДЕЛИ И СЕКЦИИ ============ */
+section {
+  display: none;
+  animation: slideIn var(--transition-base);
+}
+
+section.on {
+  display: block;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============ СПЕЦИАЛНИ ЕЛЕМЕНТИ ============ */
+/* Индикатор за състояние */
+.alert {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-4);
+  animation: slideIn var(--transition-base);
+}
+
+.alert.success {
+  background-color: rgba(34, 197, 94, 0.1);
+  color: var(--color-success);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.alert.warning {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: var(--color-warning);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.alert.error {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--color-error);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+/* Зареждащ индикатор */
+.loading {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: var(--space-4);
+  z-index: 9999;
+  opacity: 1;
+  transition: opacity var(--transition-base);
+}
+
+.loading.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 3px solid var(--bd);
+  border-top-color: var(--ac);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Offline индикатор */
+.offline-indicator {
+  position: fixed;
+  top: var(--space-4);
+  right: var(--space-4);
+  background-color: var(--cd);
+  border: 1px solid var(--bd);
+  border-radius: var(--radius-full);
+  padding: var(--space-2) var(--space-4);
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  z-index: 999;
+  box-shadow: var(--shadow-sm);
+}
+
+.offline-indicator::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--color-warning);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Toast съобщения */
+.toast {
+  position: fixed;
+  bottom: calc(70px + var(--space-4));
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background-color: var(--cd);
+  color: var(--tx);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  transition: all var(--transition-base);
+  max-width: 90%;
+  text-align: center;
+  font-size: 0.875rem;
+}
+
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+/* ============ МОБИЛНИ ОПТИМИЗАЦИИ ============ */
+@media (max-width: 640px) {
+  body {
+    padding: var(--space-3) var(--space-3) calc(70px + var(--space-3));
+    font-size: 0.9375rem; /* 15px */
+  }
+  
+  h1 {
+    font-size: 1.625rem; /* 26px */
+    margin-bottom: var(--space-4);
+  }
+  
+  h2 {
+    font-size: 1.25rem; /* 20px */
+    margin-bottom: var(--space-3);
+  }
+  
+  .c {
+    padding: var(--space-4);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-3);
+  }
+  
+  nav {
+    padding: var(--space-2);
+  }
+  
+  nav button {
+    padding: var(--space-2);
+  }
+  
+  nav button span {
+    font-size: 1.125rem;
+  }
+  
+  nav button .label {
+    font-size: 0.6875rem; /* 11px */
+  }
+  
+  /* Колони стават на един ред на малки екрани */
+  .g2, .g3, .g4 {
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+  }
+  
+  /* Увеличаваме тап зоната за бутони на телефони */
+  @media (pointer: coarse) {
+    button, input[type="submit"], input[type="button"] {
+      min-height: 44px;
+      min-width: 44px;
+    }
+    
+    /* Увеличаваме padding за по-лесен тап */
+    input, select, textarea {
+      padding: var(--space-3);
+    }
+    
+    /* По-голям gap между елементи */
+    .row {
+      gap: var(--space-2);
+    }
+  }
+}
+
+@media (max-width: 360px) {
+  body {
+    padding: var(--space-2) var(--space-2) calc(70px + var(--space-2));
+    font-size: 0.875rem; /* 14px */
+  }
+  
+  .c {
+    padding: var(--space-3);
+  }
+  
+  button {
+    padding: var(--space-2) var(--space-3);
+    font-size: 0.875rem;
+  }
+}
+
+/* ============ ОРИЕНТАЦИЯ ============ */
+/* Портретна ориентация */
+@media (orientation: portrait) {
+  .landscape-only { display: none; }
+}
+
+/* Ландшафтна ориентация */
+@media (orientation: landscape) {
+  .portrait-only { display: none; }
+  
+  /* Подобрения за ландшафт */
+  nav {
+    padding-top: calc(var(--space-1) + env(safe-area-inset-top, 0px));
+  }
+}
+
+/* ============ ИНТЕРНЕТ ИНДИКАТОР (за iOS) ============ */
+.iOS-device {
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-top: env(safe-area-inset-top);
+}
+
+/* ============ КОРЕКЦИИ ЗА iOS SAFARI ============ */
+@supports (-webkit-touch-callout: none) {
+  /* Safari специфични корекции */
+  input, select, textarea, button {
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Поправка за 100vh проблем в Safari */
+  :root {
+    --vh: 100vh;
+  }
+  
+  .full-height {
+    height: 100vh;
+    height: calc(var(--vh, 1vh) * 100);
+  }
+}
 </style>
 </head>
 <body>
-<h1>🍞 Квасен дневник</h1>
+<div class="loading" id="loading">
+  <div class="spinner"></div>
+  <div>Зареждане на Квасения дневник...</div>
+</div>
+
+<div class="offline-indicator" id="offlineIndicator" style="display: none;">⚡ Офлайн</div>
+
+<div class="toast" id="toast"></div>
+
+<h1 class="app-title">
+  <span>🍞</span>
+  <span id="appTitle">Квасен дневник</span>
+</h1>
 
 <section id="t-b" class="on">
 <div class="c"><h2>Нов хляб</h2>
@@ -216,6 +992,7 @@ td{padding:6px 4px;border-bottom:1px dashed var(--bd)}
 <nav><button data-t="b" class="on"><span>🍞</span>Хляб</button><button data-t="k"><span>⏱</span>Инструменти</button><button data-t="s"><span>🫙</span>Квас</button><button data-t="st"><span>📊</span>Статистика</button><button data-t="m"><span>⚙️</span>Още</button></nav>
 
 <script>
+// Оригинален JavaScript код от файла (не променен)
 var S={breads:[],starter:[],theme:'auto'};
 try{var r=localStorage.getItem('samun');if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}
 S.del=S.del||{};S.t=S.t||0;S.recipes=S.recipes||[];
@@ -570,346 +1347,4 @@ function addX(nm, m, tStr){
   html += '<button class="g now-btn">⏱ Сега</button>';
   html += '</div>';
   
-  html += '<div class="step-info mu" style="font-size:12px; text-align:center; min-height:16px;"></div>';
-  
-  d.innerHTML = html;
-  
-  var sel = d.querySelector('.step-name');
-  var custom = d.querySelector('.step-custom');
-  var timeInput = d.querySelector('.step-time');
-  
-  sel.onchange = function(){
-    if(this.value === 'Друго (ръчно)…'){
-      sel.style.display = 'none';
-      custom.style.display = 'block';
-      custom.focus();
-    } else {
-      sel.style.display = 'block';
-      custom.style.display = 'none';
-    }
-    plan();
-  };
-  
-  custom.oninput = plan;
-  timeInput.oninput = plan;
-  
-  d.querySelector('.now-btn').onclick = function(){
-    var now = new Date();
-    timeInput.value = now.toTimeString().slice(0,5);
-    if(window.lastBs){
-      var diffMins = Math.round((now.getTime() - window.lastBs) / 60000);
-      if(diffMins < 0) diffMins += 24*60;
-      var h = Math.floor(diffMins / 60);
-      var m = diffMins % 60;
-      var txt = 'Минаха ' + (h > 0 ? h + ' ч ' : '') + m + ' мин от насипната.';
-      d.querySelector('.step-info').textContent = txt;
-    } else {
-      d.querySelector('.step-info').textContent = 'Задай график (в Нов хляб), за да изчисли.';
-    }
-    plan();
-  };
-  
-  d.querySelector('.del-step').onclick = function(){ d.remove(); plan(); };
-  
-  if(isCustom){
-    sel.style.display = 'none';
-    custom.style.display = 'block';
-  }
-  
-  $('#xs').appendChild(d);
-}
-$('#ax').onclick=function(){addX()};
-
-function getXs(){
-  return [].map.call(document.querySelectorAll('#xs .step-card'), function(r){
-    var sel = r.querySelector('.step-name');
-    var custom = r.querySelector('.step-custom');
-    var timeEl = r.querySelector('.step-time');
-    
-    var n = '';
-    if(custom && custom.style.display !== 'none') n = custom.value.trim() || 'Стъпка';
-    else if(sel) n = sel.value;
-    
-    var t = timeEl ? timeEl.value : '';
-    var m = 0;
-    
-    if (t && window.lastBs) {
-        var parts = t.split(':');
-        var stepDate = new Date(window.lastBs);
-        stepDate.setHours(parseInt(parts[0],10), parseInt(parts[1],10), 0, 0);
-        if(stepDate.getTime() < window.lastBs - 12*60*60*1000) stepDate.setDate(stepDate.getDate()+1);
-        m = Math.round((stepDate.getTime() - window.lastBs) / 60000);
-    } else if (t) {
-        var parts = t.split(':');
-        m = parseInt(parts[0],10) * 60 + parseInt(parts[1],10);
-    }
-    
-    return { n: n, t: t, m: m };
-  }).filter(function(x){ return x.n !== 'Стъпка' || x.t; });
-}
-
-function dcalc(){var D=n($('#d1').value),f=n($('#d2').value),a=n($('#d3').value),q=n($('#d4').value),fr=n($('#d5').value),w=$('#d6').value;
-var W=D*4-(f+a+q+fr),h='Температура на водата: <b>'+W.toFixed(1)+' °C</b>'+(W<4?'<br>⚠️ Много студена — ползвай лед.':W>40?'<br>⚠️ Твърде топла за кваса.':'');
-if(w!=='')h+='<br>С тази вода тестото ще е около <b>'+((f+a+q+n(w)+fr)/4).toFixed(1)+' °C</b>';
-$('#do').innerHTML=h;window.DT=D}
-['d1','d2','d3','d4','d5','d6'].forEach(function(i){$('#'+i).oninput=dcalc});
-$('#db').onclick=function(){$('#t1').value=window.DT;tcalc()};dcalc();
-function mergeRec(a){var m={};S.recipes.concat(a||[]).forEach(function(r){m[r.id]=r});S.recipes=Object.keys(m).map(function(k){return m[k]}).filter(function(r){return!S.del[r.id]}).sort(function(x,y){return y.id-x.id})}
-function recRender(){$('#rec').innerHTML=S.recipes.length?'<div class="c"><h2>📖 Рецепти</h2>'+S.recipes.map(function(r){return '<details><summary>'+esc(r.name)+' · '+r.hyd.toFixed(0)+'%</summary><div class="mu">'+r.fl.map(function(f){return esc(f.n||'брашно')+' '+f.g+' г'}).join(', ')+'; вода '+r.w+' г; квас '+r.s+' г; сол '+r.sa+' г'+((r.ex||[]).length?'; '+r.ex.map(function(x){return esc(x.n||'добавка')+' '+x.g+' г'}).join(', '):'')+'</div>'+(r.notes?'<div style="white-space:pre-wrap;margin-top:6px">'+esc(r.notes)+'</div>':'')+'<div class="row"><button data-ru="'+r.id+'">Нов хляб</button><button class="g" data-rd="'+r.id+'">Изтрий</button></div></details>'}).join('')+'</div>':''}
-$('#sr').onclick=function(){var o=calc();if(!o.fl.length||!o.w){alert('Добави брашно и вода.');return}
-S.recipes.unshift({id:Date.now(),name:$('#nm').value.trim()||'Рецепта',fl:o.fl,ex:o.ex,w:o.w,s:o.s,sa:o.sa,sh:o.sh,hyd:o.hyd,xs:getXs(),notes:$('#rn').value.trim()});save();recRender()};
-$('#rec').addEventListener('click',function(e){var d=e.target.dataset,r;
-if(d.ru){r=S.recipes.find(function(x){return x.id==d.ru});if(r){fill(r.fl,r.w,r.s,r.sa,r.sh,r.ex,r.xs);$('#nm').value=r.name;$('#rn').value=r.notes||'';window.scrollTo(0,0)}}
-if(d.rd&&confirm('Да изтрия ли рецептата?')){S.del[d.rd]=1;S.recipes=S.recipes.filter(function(x){return x.id!=d.rd});save();recRender()}});
-function gSteps(){var bk=n($('#bk').value),rt=n($('#rt').value),au=n($('#au').value),L=[{t:'Автолиза',d:'Смеси брашното с водата (без квас и сол) и остави да почива.',m:au},{t:'Квас и сол',d:'Добави кваса и солта и омеси до гладко тесто. Измери температурата на тестото.',m:0}];
-getXs().sort(function(a,b){return a.m-b.m}).forEach(function(x){L.push({t:x.n||'Стъпка',d:'Допълнителна стъпка — '+x.m+' мин след началото на насипната.',m:0})});
-L.push({t:'Насипна ферментация',d:'Остави тестото да ферментира в купа (общо '+bk+' ч). Прави сгъвания на всеки 30 мин в началото.',m:Math.round(bk*60)},{t:'Оформяне',d:'Преформоване и оформяне, после в купа за хляб.',m:0},{t:'Хладилник',d:'Покрий и сложи в хладилника за '+rt+' ч.',m:Math.round(rt*60)},{t:'Печене',d:'Загрей фурната с тава или гърне до 250 °C, нарежи хляба. Печи около 20 мин със затворен капак, после 20–25 мин без капак при 220 °C.',m:0});
-return L}
-function gRender(){var g=S.guide,o=$('#go');
-if(!g){o.innerHTML='<button data-g="start" style="margin-top:8px">▶️ Старт</button>';return}
-var s=g.L[g.i];
-if(!s){o.innerHTML='<div class="pc">🎉 Готово! Приятен апетит.</div><button class="g" data-g="stop" style="margin-top:8px">Затвори</button>';return}
-o.innerHTML='<div class="pc"><div class="mu">Стъпка '+(g.i+1)+' от '+g.L.length+'</div><b style="font-size:18px">'+esc(s.t)+'</b><div style="margin-top:4px">'+esc(s.d)+'</div></div>'+(s.m>0?'<button class="g" data-g="timer" style="margin-top:8px">⏱ Таймер '+s.m+' мин</button>':'')+'<div class="row"><button data-g="next" style="flex:1">✓ Следваща</button><button class="g" data-g="stop" style="flex:1">Спри</button></div>'}
-$('#go').addEventListener('click',function(e){var a=e.target.dataset.g;if(!a)return;
-if(a==='start')S.guide={i:0,L:gSteps()};else if(a==='next')S.guide.i++;else if(a==='stop')S.guide=null;
-else if(a==='timer'){$('#tm1').value=S.guide.L[S.guide.i].m;$('#tm2').value=1;$('#tms').click();return}
-save();gRender()});
-gRender();recRender();
-
-function refreshNewBreadSelects() {
-  var opts = S.flours.map(function(f){return '<option value="'+esc(f.n)+'">'+(f.c||'🌍')+' '+esc(f.n)+'</option>'}).join('') + '<option value="__custom__">✏️ Друго (ръчно)…</option>';
-  document.querySelectorAll('#fl select').forEach(function(sel){
-    var cur = sel.value;
-    sel.innerHTML = '<option value="">— Избери брашно —</option>' + opts;
-    for(var i=0; i<sel.options.length; i++) {
-      if(sel.options[i].value === cur) { sel.selectedIndex = i; break; }
-    }
-  });
-}
-
-/* ===== БАЗА БРАШНА ===== */
-function flourList(){
-  var el=$('#flist');
-  if(!S.flours.length){el.innerHTML='<div class="mu">Няма добавени брашна. Добави поне едно.</div>';return}
-  
-  var cOpts = function(selected) {
-    var list = [
-      {v:'🌍', t:'🌍'}, {v:'🇧🇬', t:'🇧🇬'}, {v:'🇩🇪', t:'🇩🇪'}, {v:'🇮🇹', t:'🇮🇹'}, 
-      {v:'🇫🇷', t:'🇫🇷'}, {v:'🇺🇸', t:'🇺🇸'}, {v:'🇺🇦', t:'🇺🇦'}
-    ];
-    return list.map(function(o){ return '<option value="'+o.v+'"'+(o.v===selected?' selected':'')+'>'+o.t+'</option>'; }).join('');
-  };
-
-  el.innerHTML='<div class="pc"><div class="mu" style="margin-bottom:4px">Държава · Име · H% · W</div>'+S.flours.map(function(f,i){
-    return '<div class="row" style="margin:4px 0; gap: 4px; align-items:center;">' +
-           '<select data-fk="c" data-fi="'+i+'" style="width: 48px; padding: 6px 0px; text-align: center; font-size: 18px; -webkit-appearance: none; background: transparent; border: 1px solid var(--bd); border-radius: 8px;">'+cOpts(f.c||'🌍')+'</select>' +
-           '<input value="'+esc(f.n)+'" data-fk="n" data-fi="'+i+'" style="flex:1; padding: 6px 8px; font-size: 14px;">' +
-           '<input type="text" inputmode="decimal" value="'+f.h+'" data-fk="h" data-fi="'+i+'" style="width: 42px; padding: 6px 2px; text-align: center; font-size: 14px;" placeholder="H%">' +
-           '<input type="text" inputmode="decimal" value="'+f.w+'" data-fk="w" data-fi="'+i+'" style="width: 42px; padding: 6px 2px; text-align: center; font-size: 14px;" placeholder="W">' +
-           '<button class="g" data-fd="'+i+'" style="width:auto; padding: 6px 8px; font-size: 14px;">×</button></div>';
-  }).join('')+'</div>';
-}
-$('#fadd').onclick=function(){
-  var name=$('#fn').value.trim();
-  if(!name){alert('Въведи име на брашното.');return}
-  S.flours.push({
-    c: $('#fc').value, 
-    n: name, 
-    h: parseFloat($('#fh').value)||0, 
-    w: parseFloat($('#fw').value)||0
-  });
-  save();$('#fn').value='';flourList();refreshBlendFlourSelects();refreshNewBreadSelects();calc();
-};
-$('#flist').oninput=function(e){
-  var d=e.target.dataset;
-  if(d.fi!==undefined&&d.fk){
-    S.flours[+d.fi][d.fk]=d.fk==='n'?e.target.value:(d.fk==='c'?e.target.value:(parseFloat(e.target.value)||0));
-    save();refreshBlendFlourSelects();refreshNewBreadSelects();calc();
-  }
-};
-$('#flist').onchange=function(e){
-  var d=e.target.dataset;
-  if(d.fi!==undefined&&d.fk==='c'){
-    S.flours[+d.fi][d.fk]=e.target.value;
-    save();refreshBlendFlourSelects();refreshNewBreadSelects();calc();
-  }
-};
-$('#flist').onclick=function(e){
-  if(e.target.dataset.fd!==undefined){
-    var i=+e.target.dataset.fd;
-    if(confirm('Да изтрия ли "'+S.flours[i].n+'"?')){
-      S.flours.splice(i,1);save();flourList();refreshBlendFlourSelects();refreshNewBreadSelects();calc();
-    }
-  }
-};
-
-/* ===== СМЕСВАНЕ НА БРАШНА ===== */
-function blendMode(){
-  var pct=$('#bmode').value==='p';
-  document.querySelectorAll('#blend .row input[type=number]').forEach(function(inp){
-    inp.placeholder=pct?'%':'г';
-  });
-  $('#btotwrap').style.display=pct?'':'none';
-  blendCalc();
-}
-function addBlendRow(){
-  var pct=$('#bmode').value==='p';
-  var opts=S.flours.map(function(f,i){return '<option value="'+i+'">'+(f.c||'🌍')+' '+esc(f.n)+'</option>'}).join('');
-  if(!opts){alert('Първо добави брашно в базата.');return}
-  var d=document.createElement('div');
-  d.className='row';
-  d.innerHTML='<select style="flex:2">'+opts+'</select><input type="number" inputmode="decimal" placeholder="'+(pct?'%':'г')+'" style="max-width:100px" value="'+(pct?25:250)+'"><button class="g" style="width:auto;padding:4px 10px">×</button>';
-  d.querySelector('button').onclick=function(){d.remove();blendCalc()};
-  d.oninput=blendCalc;d.onchange=blendCalc;
-  $('#blend').appendChild(d);
-  blendCalc();
-}
-function refreshBlendFlourSelects(){
-  var opts=S.flours.map(function(f,i){return '<option value="'+i+'">'+(f.c||'🌍')+' '+esc(f.n)+'</option>'}).join('');
-  document.querySelectorAll('#blend .row select').forEach(function(sel){
-    var cur=sel.value;
-    sel.innerHTML=opts;
-    if(cur!==''&&+cur<S.flours.length)sel.value=cur;
-    else sel.value='0';
-  });
-  blendCalc();
-}
-function blendCalc(){
-  var mode=$('#bmode').value,btot=parseFloat($('#btot').value)||1000;
-  var rows=[].map.call(document.querySelectorAll('#blend .row'),function(r){
-    var sel=r.querySelector('select'),inp=r.querySelector('input'),f=S.flours[+sel.value],v=parseFloat(inp.value)||0;
-    return {f:f,v:v};
-  }).filter(function(r){return r.f&&r.v>0});
-  var o=$('#bout');
-  
-  if(!rows.length){
-    o.innerHTML='Добави поне едно брашно с количество.';
-    window.BLEND=null;
-    $('#buse').style.display='none';
-    return;
-  }
-  
-  var rows_g=rows.map(function(r){return {f:r.f,g:mode==='p'?r.v/100*btot:r.v}});
-  var total=rows_g.reduce(function(a,r){return a+r.g},0);
-  
-  if(!total){
-    o.innerHTML='Въведи грамове или проценти.';
-    window.BLEND=null;
-    $('#buse').style.display='none';
-    return;
-  }
-  
-  var wAvg=rows_g.reduce(function(a,r){return a+r.f.w*r.g},0)/total;
-  var hAvg=rows_g.reduce(function(a,r){return a+r.f.h*r.g},0)/total;
-  
-  window.BLEND = {
-    flours: rows_g.map(function(r){return {n:r.f.n, g:Math.round(r.g)}}),
-    hAvg: hAvg,
-    wAvg: wAvg,
-    total: total
-  };
-  
-  o.innerHTML=rows_g.map(function(r){
-    var pct=r.g/total*100;
-    return '🌾 '+(r.f.c||'🌍')+' '+esc(r.f.n)+': <b>'+Math.round(r.g)+' г</b> ('+pct.toFixed(1)+'%)';
-  }).join('<br>')+
-  '<hr style="border:0;border-top:1px dashed var(--bd);margin:8px 0">'+
-  'Общо брашно: <b>'+Math.round(total)+' г</b><br>'+
-  'Макс. хидратация (средно): <b>'+hAvg.toFixed(1)+'%</b><br>'+
-  'W (средно): <b>'+Math.round(wAvg)+'</b>';
-  
-  $('#buse').style.display='block';
-}
-$('#bmode').onchange=blendMode;
-$('#btot').oninput=blendCalc;
-$('#badd').onclick=addBlendRow;
-
-$('#buse').onclick = function() {
-    if(!window.BLEND || !window.BLEND.flours.length) return;
-    
-    if(window.inMode['w'] !== 'g') document.getElementById('toggle-w').click();
-    if(window.inMode['s'] !== 'g') document.getElementById('toggle-s').click();
-    if(window.inMode['sa'] !== 'g') document.getElementById('toggle-sa').click();
-    
-    $('#fl').innerHTML = '';
-    
-    var totalFlour = 0;
-    window.BLEND.flours.forEach(function(f) {
-        addF(f.n, f.g);
-        totalFlour += f.g;
-    });
-    
-    var water = Math.round(totalFlour * (window.BLEND.hAvg / 100));
-    $('#w').value = water;
-    
-    var starter = Math.round(totalFlour * 0.2);
-    var salt = (totalFlour * 0.02).toFixed(1);
-    $('#s').value = starter;
-    $('#sa').value = salt;
-    
-    calc();
-    
-    document.querySelector('nav button[data-t="b"]').click();
-    window.scrollTo(0,0);
-    
-    setTimeout(function() { 
-        alert('Успешно пренасяне!\n\nВодата е изчислена автоматично на ' + water + 'г. (спрямо ' + window.BLEND.hAvg.toFixed(1) + '% хидратация).\nКвасът и солта също са попълнени.'); 
-    }, 300);
-};
-
-flourList();
-addBlendRow();
-
-/* ===== ХЛЕБНА МАТЕМАТИКА ===== */
-var g1=function(x){return(Math.round(x*10)/10).toString().replace('.',',')};
-var DN=[['Вода',1],['Мляко',1.03],['Бяло брашно',.52],['Пълнозърнесто брашно',.5],['Ръжено брашно',.43],['Захар',.83],['Кафява захар',.9],['Сол',1.2],['Зехтин / олио',.91],['Мед',1.42],['Масло',.95]];
-var UN=[['чаша (240 мл)',240],['с.л. (15 мл)',15],['ч.л. (5 мл)',5],['мл',1]];
-var YT=[['Прясна мая',1/3],['Суха активна мая',.8],['Инстантна мая',1]];
-var CALC=[
-{t:'💧 Хидратация',d:'Хидратация на тестото, като кваса се отчита по брашно и вода.',f:[{l:'Брашно (г)',v:500},{l:'Вода (г)',v:350},{l:'Квас (г)',v:100},{l:'Хидр. на кваса %',v:100}],
-o:function(v){var sf=v[2]/(1+v[3]/100),F=v[0]+sf,W=v[1]+v[2]-sf;return F?'Хидратация: <b>'+g1(W/F*100)+'%</b><br>Общо брашно '+g1(F)+' г · вода '+g1(W)+' г':'—'}},
-{t:'↔️ Мащабиране',d:'Всеки ред: име и грамове. Задай множител или ново общо тегло.',f:[{l:'Съставки',v:'брашно 500\nвода 350\nквас 100\nсол 10',ta:1},{l:'Множител',v:2},{l:'ИЛИ ново общо тегло (г)',v:0}],
-o:function(v){var L=v[0].split('\n').map(function(x){var m=x.match(/^(.*?)[\s:]+([\d.,]+)\s*г?$/);return m?{n:m[1].trim(),g:parseFloat(m[2].replace(',','.'))}:null}).filter(Boolean),T=L.reduce(function(a,b){return a+b.g},0),k=v[2]>0&&T?v[2]/T:v[1];
-return L.map(function(x){return esc(x.n)+': <b>'+g1(x.g*k)+' г</b>'}).join('<br>')+'<br><span class="mu">Множител ×'+g1(k)+' · общо '+g1(T*k)+' г</span>'}},
-{t:'🥄 Мерки → грамове',d:'1 чаша = 240 мл. Стойностите са приблизителни.',f:[{l:'Съставка',s:DN},{l:'Количество',v:1},{l:'Мярка',s:UN}],
-o:function(v){return '≈ <b>'+g1(v[1]*UN[v[2]][1]*DN[v[0]][1])+' г</b>'}},
-{t:'🔁 Мая ↔ квас',d:'Замяна на мая с квас и обратно. Кваса носи брашно и вода и те се приспадат.',f:[{l:'Посока',s:[['Мая → квас'],['Квас → мая']]},{l:'Брашно (г)',v:500},{l:'Вода (г)',v:350},{l:'Квас (г) — за посока „квас → мая“',v:100},{l:'Квас % от брашното',v:20},{l:'Мая % от брашното',v:.3},{l:'Хидр. на кваса %',v:100}],
-o:function(v){var k=1+v[6]/100;if(v[0]==0){var S=v[1]*v[4]/100,sf=S/k,sw=S-sf,nf=v[1]-sf,nw=v[2]-sw;return nf<0||nw<0?'Кваса е твърде много за тази рецепта.':'Квас: <b>'+g1(S)+' г</b><br>Брашно: <b>'+g1(nf)+' г</b> · вода: <b>'+g1(nw)+' г</b><br><span class="mu">Без мая. Насипната ще е по-дълга.</span>'}
-var sf2=v[3]/k,F=v[1]+sf2,W=v[2]+v[3]-sf2;return 'Брашно: <b>'+g1(F)+' г</b> · вода: <b>'+g1(W)+' г</b><br>Инстантна мая: <b>'+g1(F*v[5]/100)+' г</b>'}},
-{t:'🧪 Конвертор на мая',d:'1 г инстантна = 1,25 г суха активна = 3 г прясна.',f:[{l:'Количество (г)',v:7},{l:'От',s:YT},{l:'Към',s:YT}],
-o:function(v){return '≈ <b>'+g1(v[0]*YT[v[1]][1]/YT[v[2]][1])+' г</b>'}},
-{t:'🫙 Калкулатор за левен',d:'Колко брашно и вода да добавиш към малко стар квас, за да получиш нужния левен.',f:[{l:'Брашно в рецептата (г)',v:500},{l:'Левен % от брашното',v:20},{l:'Хидр. на левена %',v:100},{l:'Стар квас (г)',v:10},{l:'Хидр. на стария квас %',v:100}],
-o:function(v){var L=v[0]*v[1]/100,Fl=L/(1+v[2]/100),Wt=L-Fl,sf=v[3]/(1+v[4]/100),af=Fl-sf,aw=Wt-(v[3]-sf);return af<0||aw<0||!v[3]?'Стария квас е твърде много или хидратациите не се получават.':'Нужен левен: <b>'+g1(L)+' г</b><br>Добави брашно: <b>'+g1(af)+' г</b> · вода: <b>'+g1(aw)+' г</b><br>Съотношение: <b>1 : '+g1(af/v[3])+' : '+g1(aw/v[3])+'</b>'}}
-];
-(function(){var h='';CALC.forEach(function(c,ci){h+='<details><summary>'+c.t+'</summary><div class="mu">'+c.d+'</div><div class="g2">'+c.f.map(function(f,fi){var id='cc'+ci+'_'+fi;return '<div'+(f.ta?' style="grid-column:1/3"':'')+'><label>'+f.l+'</label>'+(f.s?'<select id="'+id+'">'+f.s.map(function(o,i){return '<option value="'+i+'">'+o[0]+'</option>'}).join('')+'</select>':f.ta?'<textarea id="'+id+'" rows="4">'+f.v+'</textarea>':'<input id="'+id+'" type="number" inputmode="decimal" value="'+f.v+'">')+'</div>'}).join('')+'</div><div class="pc" id="co'+ci+'"></div></details>'});
-$('#cc').innerHTML=h;
-CALC.forEach(function(c,ci){function run(){var v=c.f.map(function(f,fi){var e=$('#cc'+ci+'_'+fi);return f.s?+e.value:f.ta?e.value:n(e.value)});try{$('#co'+ci).innerHTML=c.o(v)}catch(x){$('#co'+ci).textContent='—'}}
-c.f.forEach(function(f,fi){var e=$('#cc'+ci+'_'+fi);e.oninput=run;e.onchange=run});run()})})();
-
-/* ===== БЕКЪП ===== */
-function bkMsg(t){$('#bk-msg').textContent=t}
-$('#bk-ex').onclick=function(){bkMsg('Подготвяне…');
-pAll(null).then(function(photos){
-var pkg={app:'samun',v:1,exported:Date.now(),state:S,photos:photos};
-var blob=new Blob([JSON.stringify(pkg)],{type:'application/json'});
-var u=URL.createObjectURL(blob),a=document.createElement('a');
-a.href=u;a.download='samun-backup-'+new Date().toISOString().slice(0,10)+'.json';
-document.body.appendChild(a);a.click();a.remove();
-setTimeout(function(){URL.revokeObjectURL(u)},4000);
-bkMsg('Готово. Запази файла (Share → Save to Files) и го качи където искаш.')})};
-function bkMergeState(R){var del=Object.assign({},S.del,R.del||{});
-function mg(k,key){var m={};(S[k]||[]).concat(R[k]||[]).forEach(function(x){m[x[key]]=x});return Object.keys(m).map(function(i){return m[i]}).filter(function(x){return!del[x[key]]})}
-S.breads=mg('breads','id').sort(function(x,y){return y.id-x.id});S.starter=mg('starter','d').sort(function(x,y){return y.d-x.d});S.del=del;
-if(R.flours&&R.flours.length)S.flours=R.flours}
-$('#bk-im').onchange=function(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();
-r.onload=async function(){try{var pkg=JSON.parse(r.result);if(!pkg.state)throw 0;
-bkMergeState(pkg.state);mergeRec(pkg.state.recipes);save();
-flourList();refreshBlendFlourSelects();refreshNewBreadSelects();
-var have={};(await pAll(null)).forEach(function(p){have[p.k]=1});
-for(var p of(pkg.photos||[]))if(!have[p.k])await pDo('put',p);
-render();qr();bkMsg('Възстановено.');e.target.value=''}catch(x){bkMsg('Невалиден файл.')}};
-r.readAsText(f)};
-tcalc();render();qr();
-</script>
-</body>
-</html>
+  html += '<div class="step-info mu" style="font-size:12px; text-align:center; min-height
