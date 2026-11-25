@@ -217,6 +217,7 @@ td{padding:6px 4px;border-bottom:1px dashed var(--bd)}
 <div class="c"><h2>Изглед</h2><select id="th"><option value="auto">Автоматично</option><option value="light">Светла</option><option value="dark">Тъмна</option><option value="green">Пшеница (зелена)</option></select></div>
 <div class="c"><h2>Резервно копие на файл</h2>
 <button id="bk-ex" style="margin-top:8px">⬇️ Изтегли резервно копие</button>
+<button class="g" id="bk-sh2" style="margin-top:8px;display:none">📤 Сподели файла</button>
 <label style="margin-top:10px">Възстанови от файл</label><input type="file" id="bk-im" accept="application/json">
 <div class="mu" id="bk-msg" style="margin-top:6px"></div></div>
 <div class="c"><h2>Размер на снимките</h2><select id="px"><option value="800">Малки (800 px)</option><option value="1000">Средни (1000 px)</option><option value="1400">Големи (1400 px)</option></select></div>
@@ -875,6 +876,21 @@ $('#buse').onclick = function() {
     calc(); document.querySelector('nav button[data-t="b"]').click(); window.scrollTo(0,0);
 };
 
+function bkMsg(t){$('#bk-msg').textContent=t}
+function bkFile(){return pAll(null).then(function(ph){return new File([JSON.stringify({app:'samun',v:1,exported:Date.now(),state:S,photos:ph})],'samun-backup-'+new Date().toISOString().slice(0,10)+'.json',{type:'application/json'})})}
+function bkDownload(f){var u=URL.createObjectURL(f),a=document.createElement('a');a.href=u;a.download=f.name;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u)},4000)}
+$('#bk-ex').onclick=function(){bkMsg('Подготвяне…');bkFile().then(function(f){window.BKF=f;
+if(navigator.canShare&&navigator.canShare({files:[f]})){navigator.share({files:[f],title:'Самун — резервно копие'}).then(function(){bkMsg('Готово.')}).catch(function(e){if(e&&e.name==='AbortError'){bkMsg('');return}$('#bk-sh2').style.display='block';bkMsg('Натисни „Сподели файла“ по-долу.')})}
+else{bkDownload(f);bkMsg('Файлът е изтеглен (Файлове → Изтегляния).')}})};
+$('#bk-sh2').onclick=function(){if(!window.BKF)return;navigator.share({files:[window.BKF],title:'Самун — резервно копие'}).then(function(){bkMsg('Готово.');$('#bk-sh2').style.display='none'}).catch(function(e){if(e&&e.name!=='AbortError'){bkDownload(window.BKF);bkMsg('Опитах да го изтегля като файл.')}})};
+function bkMergeState(R){var del=Object.assign({},S.del,R.del||{});function mg(k,key){var m={};(S[k]||[]).concat(R[k]||[]).forEach(function(x){m[x[key]]=x});return Object.keys(m).map(function(i){return m[i]}).filter(function(x){return!del[x[key]]})}
+S.breads=mg('breads','id').sort(function(x,y){return y.id-x.id});S.starter=mg('starter','d').sort(function(x,y){return y.d-x.d});S.del=del}
+$('#bk-im').onchange=function(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();
+r.onload=async function(){try{var pkg=JSON.parse(r.result);if(!pkg.state)throw 0;bkMergeState(pkg.state);mergeRec(pkg.state.recipes);
+(pkg.state.flours||[]).forEach(function(fl){if(!S.flours.some(function(x){return x.n===fl.n}))S.flours.push(fl)});save();
+var have={};(await pAll(null)).forEach(function(q){have[q.k]=1});for(var q of(pkg.photos||[]))if(!have[q.k])await pDo('put',q);
+render();qr();recRender();flourList();refreshBlendFlourSelects();refreshNewBreadSelects();bkMsg('Възстановено.');e.target.value=''}catch(x){bkMsg('Невалиден файл.')}};
+r.readAsText(f)};
 function bkRead(){return{mode:$('#bk-mode').value,d1:n($('#bk-d1').value),m1:n($('#bk-m1').value),d2:n($('#bk-d2').value),m2:n($('#bk-m2').value),fan:$('#bk-fan').value}}
 function bkUI(){var pot=$('#bk-mode').value==='pot',b=bkRead();
 $('#bk-l1').textContent=pot?'1. С капак':'1. С пара';
