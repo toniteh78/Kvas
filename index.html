@@ -56,7 +56,8 @@ td{padding:6px 4px;border-bottom:1px dashed var(--bd)}
 .step-card .step-time{-webkit-appearance:none;appearance:none;min-width:0;height:38px}
 .step-card .step-temp{padding:8px 2px;font-size:14px}
 .step-card .now-btn{padding:8px 10px;font-size:13px;white-space:nowrap;height:38px}
-.step-card .up,.step-card .dn{padding:4px 12px;height:34px;font-size:15px}
+.step-card .row-inner button.up,.step-card .row-inner button.dn{padding:0;height:30px;width:36px;font-size:14px;flex:none}
+.step-card .row-inner button.note-btn{padding:8px 10px;height:38px;flex:none}
 .fld{display:flex;flex-direction:column}.fld label{margin:0 0 2px;font-size:11px}
 .step-card .step-note{width:100%;resize:none;overflow:hidden;font-size:14px;min-height:38px;padding:8px;margin:0}
 .step-card .row-inner button { width: auto; padding: 8px 12px; margin: 0; box-shadow: none; }
@@ -68,7 +69,7 @@ td{padding:6px 4px;border-bottom:1px dashed var(--bd)}
 <section id="t-b" class="on">
 <div class="c"><h2>Ново печиво</h2>
 <label>Избор</label>
-<select id="kind"><option value="Хляб">🍞 Хляб</option><option value="Питка">🫓 Питка</option><option value="Багета">🥖 Багета</option><option value="Кроасан">🥐 Кроасан</option><option value="Панетоне">🧁 Панетоне</option><option value="Баница">🥧 Баница</option><option value="Пица">🍕 Пица</option></select>
+<select id="kind" autocomplete="off"><option value="Хляб">🍞 Хляб</option><option value="Питка">🫓 Питка</option><option value="Багета">🥖 Багета</option><option value="Кроасан">🥐 Кроасан</option><option value="Панетоне">🧁 Панетоне</option><option value="Баница">🥧 Баница</option><option value="Пица">🍕 Пица</option></select>
 <label>Име</label><input id="nm" placeholder="Напр. Селски хляб">
 <label>Брашна (вид и грамове)</label><div id="fl"></div>
 <button class="g" id="af" style="margin-top:6px">+ Добави брашно</button>
@@ -105,12 +106,13 @@ td{padding:6px 4px;border-bottom:1px dashed var(--bd)}
 
 <label style="margin-top:14px">Стъпки (задай часове)</label>
 <div id="xs"></div>
-<div class="row"><button class="g" id="ax" style="flex:1">+ Стъпка</button><button class="g" id="asort" style="flex:1">↕ Подреди по процеса</button></div>
+<button class="g" id="ax" style="margin-top:6px">+ Стъпка</button>
+<div class="row"><button class="g" id="asort" style="flex:1;white-space:nowrap">↕ По процеса</button><button class="g" id="asort2" style="flex:1;white-space:nowrap">🕒 По часа</button></div>
 
 <div class="c" style="margin-top:14px; border: 2px solid var(--ac);">
 <h2>🔥 Печене</h2>
 <label>Начин</label>
-<select id="bk-mode"><option value="pot">🍲 Тенджера (с капак → без капак)</option><option value="free">🔥 Свободно (с пара → без пара)</option></select>
+<select id="bk-mode" autocomplete="off"><option value="pot">🍲 Тенджера (с капак → без капак)</option><option value="free">🔥 Свободно (с пара → без пара)</option></select>
 <div class="step-card"><b id="bk-l1">1. С капак</b>
 <div class="g2"><div><label>Температура (°C)</label><input id="bk-d1" type="number" inputmode="decimal" value="250"></div>
 <div><label>Време (мин)</label><input id="bk-m1" type="number" inputmode="decimal" value="20"></div></div></div>
@@ -124,7 +126,8 @@ td{padding:6px 4px;border-bottom:1px dashed var(--bd)}
 
 <label style="margin-top:10px">Бележки и стъпки на рецептата</label><textarea id="rn" rows="3"></textarea>
 <button id="sv" style="margin-top:10px">Запази хляба</button>
-<button class="g" id="sr" style="margin-top:8px">📖 Запази като рецепта</button></div>
+<button class="g" id="sr" style="margin-top:8px">📖 Запази като рецепта</button>
+<button class="g" id="rst" style="margin-top:8px">🗑 Изчисти формата</button></div>
 <div id="list"></div>
 <div id="rec"></div>
 </section>
@@ -260,7 +263,7 @@ function formatTimeMins(mins) {
 }
 
 var PASTRY_STEPS=['Замесване','Окръгляне','Отпускане','Разточване','Финално отпускане'];
-var STEP_OPTS=['Приготвяне на левейн','Автолиза','Ферментолиза','Начало на добавяне на кваса','Добавяне на солта','Замесване','Край на замесване','Насипна ферментация','Lamination (Ламиниране)','Stretch & Fold','Coil Fold','Pre-shape (Преформиране)','Final Shape (Финално)','Топла ферментация','Прибиране в хладилник','Друго (ръчно)…'];
+var STEP_OPTS=['Приготвяне на левейн','Автолиза','Ферментолиза','Начало на добавяне на кваса','Замесване','Добавяне на солта','Край на замесване','Насипна ферментация','Lamination (Ламиниране)','Stretch & Fold','Coil Fold','Pre-shape (Преформиране)','Final Shape (Финално)','Топла ферментация','Прибиране в хладилник','Друго (ръчно)…'];
 var KINDS={'Хляб':'🍞','Питка':'🫓','Багета':'🥖','Кроасан':'🥐','Панетоне':'🧁','Баница':'🥧','Пица':'🍕'};
 function kindIc(k){return KINDS[k]||'🍞'}
 function normBake(b){if(!b)return null;if(b.mode)return b;var free=/свободно/i.test(b.vessel||'');
@@ -268,43 +271,21 @@ return{mode:free?'free':'pot',d1:+b.temp||250,m1:+b.t1||0,d2:+b.temp||250,m2:+b.
 function bakeTxt(b){b=normBake(b);if(!b)return'';var pot=b.mode==='pot',o=(pot?'🍲 Тенджера: ':'🔥 Свободно: ')+b.d1+'°C · '+b.m1+' мин '+(pot?'с капак':'с пара');
 if(+b.m2>0)o+=' → '+b.d2+'°C · '+b.m2+' мин '+(pot?'без капак':'без пара');return o}
 function bakeMin(b){b=normBake(b);return b?(+b.m1||0)+(+b.m2||0):0}
+function stepTimes(xs){var out=[],prevAbs=null,base=null;(xs||[]).forEach(function(x){var r={has:false};
+ if(x&&x.t){var pp=String(x.t).split(':');if(pp.length>=2){var m=parseInt(pp[0])*60+parseInt(pp[1]);r.has=true;
+  if(prevAbs===null){r.first=true;r.diff=0;r.abs=m;base=m}else{var d=m-(prevAbs%1440);if(d<-720)d+=1440;if(d>720)d-=1440;r.first=false;r.diff=d;r.abs=prevAbs+d;r.warn=d<0}
+  r.el=r.abs-base;prevAbs=r.abs}}
+ out.push(r)});return out}
 function stepNums(xs){var prev=0;return (xs||[]).map(function(x){var v=parseInt(x.no);var num=(x.no!==undefined&&x.no!==null&&String(x.no).trim()!==''&&!isNaN(v))?v:prev+1;prev=num;return num})}
-function renumber(){var prev=0;document.querySelectorAll('#xs .step-card').forEach(function(c){var i=c.querySelector('.step-no'),v=parseInt(i.value),num=(i.value.trim()!==''&&!isNaN(v))?v:prev+1;i.placeholder=num;prev=num})}
-function stepsList(xs){var prev=null,h='';var nums=stepNums(xs);(xs||[]).forEach(function(x,i){var tm='',diff='';
- if(x.t){var p=x.t.split(':');if(p.length>=2){var cur=parseInt(p[0])*60+parseInt(p[1]);if(prev!==null&&cur<prev)cur+=1440;if(prev!==null)diff=' <span class="mu">(след '+formatTimeMins(cur-prev)+')</span>';prev=cur;tm='🕒 <b>'+x.t+'</b> – '}}
+function updateElapsed(){var cards=[].slice.call(document.querySelectorAll('#xs .step-card')),tt=stepTimes(cards.map(function(c){return{t:c.querySelector('.step-time').value}}));
+cards.forEach(function(c,i){var r=tt[i],el=c.querySelector('.step-info');if(!r.has){el.textContent='';return}
+ el.innerHTML=r.first?'⏱ Начало':'⏱ '+formatTimeMins(Math.max(0,r.el))+' от началото · '+(r.diff>=0?'+':'−')+formatTimeMins(Math.abs(r.diff))+' от предишната'+(r.warn?' <b style="color:#c0392b">⚠️ по-рано от предишната</b>':'')})}
+function renumber(){updateElapsed();var prev=0;document.querySelectorAll('#xs .step-card').forEach(function(c){var i=c.querySelector('.step-no'),v=parseInt(i.value),num=(i.value.trim()!==''&&!isNaN(v))?v:prev+1;i.placeholder=num;prev=num})}
+function stepsList(xs){var nums=stepNums(xs),tt=stepTimes(xs),h='';(xs||[]).forEach(function(x,i){var r=tt[i],tm='',diff='';
+ if(r.has){tm='🕒 <b>'+x.t+'</b> – ';if(!r.first)diff=' <span class="mu">('+(r.warn?'⚠️ ':'')+(r.diff>=0?'+':'−')+formatTimeMins(Math.abs(r.diff))+' · общо '+formatTimeMins(Math.max(0,r.el))+')</span>'}
  h+='<div style="padding:3px 0;"><b>'+nums[i]+'.</b> '+tm+esc(x.n)+(x.ra?' · '+esc(x.ra):'')+(x.c?' · 🌡 '+esc(x.c)+'°C':'')+diff+(x.note?'<div class="mu" style="margin-left:22px;white-space:pre-wrap">📝 '+esc(x.note)+'</div>':'')+'</div>'});return h}
-function calcTotalTime(xs, bake) {
-    var firstMins = null;
-    var lastMins = null;
-    var prevMins = null;
-    
-    if (xs && xs.length) {
-        xs.forEach(function(x) {
-            if (!x.t) return;
-            var parts = x.t.split(':');
-            if (parts.length < 2) return;
-            var currentMins = parseInt(parts[0])*60 + parseInt(parts[1]);
-            
-            if (firstMins === null) firstMins = currentMins;
-            if (prevMins !== null && currentMins < prevMins) currentMins += 24*60;
-            
-            lastMins = currentMins;
-            prevMins = currentMins;
-        });
-    }
-    
-    var bakeMins = 0;
-    if (bake) {
-        bakeMins = bakeMin(bake);
-    }
-    
-    if (firstMins !== null && lastMins !== null) {
-        return (lastMins + bakeMins) - firstMins;
-    } else if (bakeMins > 0) {
-        return bakeMins;
-    }
-    return 0;
-}
+function calcTotalTime(xs, bake){var bm=bakeMin(bake),T=stepTimes(xs).filter(function(r){return r.has});
+  if(T.length)return Math.max(0,T[T.length-1].el)+bm;return bm}
 
 document.querySelectorAll('nav button').forEach(function(b){b.onclick=function(){
 document.querySelectorAll('nav button,section').forEach(function(e){e.classList.remove('on')});
@@ -411,14 +392,14 @@ var avgH = countG ? (totalH / countG).toFixed(1) : null;
 var extraInfo = avgW !== null ? '<br><br>🌾 <b>Средно W: ' + avgW + '</b> | <b>Макс. вода: ' + avgH + '%</b>' : '';
 
 $('#pc').innerHTML=F&&W?'Хидратация <b>'+o.hyd.toFixed(1)+'%</b> '+(window.curKind==='Баница'?'':'· квас <b>'+o.st.toFixed(1)+'%</b>')+' · сол <b>'+o.sl.toFixed(1)+'%</b>'+(E?'<br>'+(window.curKind==='Баница'?'Плънка':'Добавки')+': '+ex.map(function(x){return esc(x.n||'добавка')+' '+x.g+' г ('+(F?(x.g/F*100).toFixed(1):0)+'%)'}).join(', '):'')+(Ft?'<br>Мазнини: '+fat.map(function(x){return esc(x.n||'мазнина')+' '+x.g+' г'}).join(', '):'')+'<br>Общо тесто: <b>'+Math.round(o.tot)+' г</b>' + extraInfo :'Въведи брашно и вода, за да видиш пекарските проценти.';
-return o}
+draftSaveSoon();return o}
 ['w','s','sa','sh'].forEach(function(i){$('#'+i).oninput=calc});
 
 $('#sv').onclick=function(){var o=calc();if(!o.fl.length||!o.w){alert('Добави брашно и вода.');return}
 o.id=Date.now();o.name=$('#nm').value.trim()||'Хляб от '+new Date().toLocaleDateString('bg-BG');
 o.xs=getXs();o.kind=$('#kind').value;o.rating=0;o.notes='';
 o.bake=bkRead();
-S.breads.unshift(o);save();render();$('#nm').value=''};
+S.breads.unshift(o);save();render();$('#nm').value='';draftClear()};
 
 function render(){
 $('#list').innerHTML=S.breads.map(function(b){
@@ -613,15 +594,17 @@ function addX(nm, tStr, temp, note, no, ra){
   html += '<div class="row-inner" style="align-items:flex-end;">';
   html += '<div class="fld" style="flex:1;min-width:0;"><label>Час</label><input type="time" class="step-time" value="'+(tStr||'')+'"></div>';
   html += '<div class="fld" style="flex:none;width:58px;"><label class="lbl-temp">Темп. °C</label><input type="number" inputmode="decimal" class="step-temp" placeholder="24" value="'+esc(temp==null?'':temp)+'"></div>';
-  html += '<button class="g now-btn">⏱ Сега</button>';
+  html += '<button class="g now-btn">⏱ Сега</button><button class="g note-btn" title="Бележка">📝</button>';
   html += '</div>';
-  html += '<textarea class="step-note" rows="1" placeholder="Бележка към стъпката (по избор)">'+esc(note||'')+'</textarea>';
+  html += '<textarea class="step-note" rows="1" placeholder="Бележка към стъпката (по избор)" style="display:'+(note?'block':'none')+';">'+esc(note||'')+'</textarea>';
   html += '<div class="row-inner" style="align-items:center;"><div class="step-info mu" style="flex:1;font-size:12px;min-height:16px;"></div><button class="g up" title="Нагоре">↑</button><button class="g dn" title="Надолу">↓</button></div>';
   d.innerHTML = html;
   var nt = d.querySelector('.step-note');
   function grow(){ nt.style.height = 'auto'; nt.style.height = Math.max(38, nt.scrollHeight) + 'px'; }
   nt.addEventListener('input', grow);
   d.querySelector('.step-no').addEventListener('input', renumber);
+  d.querySelector('.step-time').addEventListener('input', updateElapsed);
+  d.querySelector('.note-btn').onclick = function(){ var shown = nt.style.display !== 'none'; nt.style.display = shown ? 'none' : 'block'; if(!shown){ grow(); nt.focus(); } };
   
   var sel = d.querySelector('.step-name');
   var custom = d.querySelector('.step-custom');
@@ -638,7 +621,7 @@ function addX(nm, tStr, temp, note, no, ra){
     }
   };
   
-  d.querySelector('.now-btn').onclick = function(){
+  d.querySelector('.now-btn').onclick = function(){ setTimeout(updateElapsed, 0);
     var now = new Date();
     timeInput.value = now.toTimeString().slice(0,5);
 
@@ -722,7 +705,7 @@ $('#rec').innerHTML=S.recipes.length?'<div class="c"><h2>📖 Рецепти</h2
 }
 $('#sr').onclick=function(){var o=calc();if(!o.fl.length||!o.w){alert('Добави брашно и вода.');return}
 o.bake=bkRead();
-S.recipes.unshift({id:Date.now(),kind:$('#kind').value,name:$('#nm').value.trim()||'Рецепта',fl:o.fl,ex:o.ex,fat:o.fat,w:o.w,s:o.s,sa:o.sa,sh:o.sh,hyd:o.hyd,xs:getXs(),bake:o.bake,notes:$('#rn').value.trim()});save();recRender()};
+S.recipes.unshift({id:Date.now(),kind:$('#kind').value,name:$('#nm').value.trim()||'Рецепта',fl:o.fl,ex:o.ex,fat:o.fat,w:o.w,s:o.s,sa:o.sa,sh:o.sh,hyd:o.hyd,xs:getXs(),bake:o.bake,notes:$('#rn').value.trim()});save();recRender();draftClear()};
 $('#rec').addEventListener('click',function(e){var d=e.target.dataset,r;
 if(d.ru){r=S.recipes.find(function(x){return x.id==d.ru});if(r){fill(r.fl,r.w,r.s,r.sa,r.sh,r.ex,r.xs,r.bake,r.kind,r.fat);$('#nm').value=r.name;$('#rn').value=r.notes||'';window.scrollTo(0,0)}}
 if(d.rd&&confirm('Да изтрия ли рецептата?')){S.del[d.rd]=1;S.recipes=S.recipes.filter(function(x){return x.id!=d.rd});save();recRender()}});
@@ -855,7 +838,7 @@ var have={};(await pAll(null)).forEach(function(q){have[q.k]=1});for(var q of(pk
 render();qr();recRender();flourList();refreshBlendFlourSelects();refreshNewBreadSelects();bkMsg('Възстановено.');e.target.value=''}catch(x){bkMsg('Невалиден файл.')}};
 r.readAsText(f)};
 function bkRead(){return{mode:$('#bk-mode').value,d1:n($('#bk-d1').value),m1:n($('#bk-m1').value),d2:n($('#bk-d2').value),m2:n($('#bk-m2').value),fan:$('#bk-fan').value}}
-function bkUI(){var pot=$('#bk-mode').value==='pot',b=bkRead();
+function bkUI(){var bm0=$('#bk-mode');if(!bm0.value&&bm0.options.length)bm0.value=bm0.options[0].value;var pot=$('#bk-mode').value==='pot',b=bkRead();
 $('#bk-l1').textContent=pot?'1. С капак':'1. С пара';
 $('#bk-l2').textContent=pot?'2. Без капак — махни капака и свали градусите':'2. Без пара — извади съда с водата и свали градусите';
 $('#bk-hint').textContent=pot?'':'Парата: тава с вряла вода, лед или пръскане в първите минути.';
@@ -886,7 +869,32 @@ var known=items.filter(function(x){return x.k>=0}),sorted=known.slice().sort(fun
 items.forEach(function(x,pos){if(x.k>=0)out[pos]=sorted[ki++]});
 out.forEach(function(x){$('#xs').appendChild(x.c)});renumber()}
 $('#asort').onclick=sortSteps;
+$('#asort2').onclick=function(){var cards=[].slice.call(document.querySelectorAll('#xs .step-card')),base=null;
+var items=cards.map(function(c,i){var t=c.querySelector('.step-time').value,m=null;if(t){var pp=t.split(':');m=parseInt(pp[0])*60+parseInt(pp[1]);if(base===null)base=m}return{c:c,i:i,m:m}});
+items.forEach(function(x){if(x.m!==null)x.k=(x.m-base+1440)%1440});
+var timed=items.filter(function(x){return x.m!==null}),sorted=timed.slice().sort(function(a,b){return a.k-b.k||a.i-b.i}),out=items.slice(),ki=0;
+items.forEach(function(x,pos){if(x.m!==null)out[pos]=sorted[ki++]});
+out.forEach(function(x){$('#xs').appendChild(x.c)});renumber()};
+/* ===== ЧЕРНОВА: пази се, докато не запишеш хляб или рецепта ===== */
+var draftT=null;
+function draftRows(id){return [].map.call(document.querySelectorAll(id+' .row'),function(r){var i=r.querySelectorAll('input');return{n:i[0]?i[0].value:'',g:i[1]?i[1].value:''}})}
+function draftGet(){var fl=[].map.call(document.querySelectorAll('#fl .row'),function(r){var nEl=r.querySelector('select, input[type="text"]'),gEl=r.querySelector('input[type="number"]');return{n:nEl?nEl.value:'',g:gEl?gEl.value:''}});
+return{kind:$('#kind').value,name:$('#nm').value,fl:fl,w:$('#w').value,s:$('#s').value,sa:$('#sa').value,sh:$('#sh').value,im:Object.assign({},window.inMode),ex:draftRows('#ex'),fat:draftRows('#fat'),xs:getXs(),bake:bkRead(),rn:$('#rn').value}}
+function draftSave(){if(!window.draftReady)return;try{localStorage.setItem('samun-draft',JSON.stringify(draftGet()))}catch(e){}}
+function draftSaveSoon(){clearTimeout(draftT);draftT=setTimeout(draftSave,350)}
+function draftClear(){clearTimeout(draftT);try{localStorage.removeItem('samun-draft')}catch(e){}}
+function draftRestore(){var d=null;try{d=JSON.parse(localStorage.getItem('samun-draft')||'null')}catch(e){}if(!d)return;
+fill(d.fl||[],d.w||'',d.s||'',d.sa||'',d.sh||'100',d.ex||[],d.xs||[],d.bake||null,d.kind||'Хляб',d.fat||[]);
+if(!document.querySelector('#fl .row')){addF();addF()}
+['w','s','sa'].forEach(function(k){if(d.im&&d.im[k]==='%'){window.inMode[k]='%';var el=$('#toggle-'+(k==='sa'?'sa':k));el.textContent='%';el.style.background='var(--ac)';el.style.color='var(--on)'}$('#'+k).value=d[k]||''});
+$('#nm').value=d.name||'';$('#rn').value=d.rn||'';calc()}
+(function(){var card=document.querySelector('#t-b .c');
+card.addEventListener('input',draftSaveSoon);card.addEventListener('change',draftSaveSoon);
+card.addEventListener('click',function(e){var id=e.target.id;if(id==='sv'||id==='sr'||id==='rst')return;draftSaveSoon()})})();
+$('#rst').onclick=function(){if(!confirm('Да изчистя ли формата?'))return;
+fill([],'','','',100,[],[],null,'Хляб',[]);addF();addF();$('#nm').value='';$('#rn').value='';calc();draftClear()};
 flourList(); addBlendRow(); tcalc(); render(); qr(); bkUI();
+try{draftRestore()}catch(e){}finally{window.draftReady=true}
 </script>
 </body>
 </html>
