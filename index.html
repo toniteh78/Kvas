@@ -119,7 +119,9 @@ td{padding:6px 4px;border-bottom:1px dashed var(--bd)}
 <div class="step-card"><b id="bk-l2">2. Без капак</b>
 <div class="g2"><div><label>Температура (°C)</label><input id="bk-d2" type="number" inputmode="decimal" value="220"></div>
 <div><label>Време (мин)</label><input id="bk-m2" type="number" inputmode="decimal" value="25"></div></div></div>
-<div class="g2"><div><label>Вентилатор (във фаза 2)</label><select id="bk-fan"><option>Без вентилатор</option><option>С вентилатор</option></select></div>
+<div class="row" style="align-items:flex-end"><div class="fld" style="flex:1;min-width:0"><label>Влиза във фурната в</label><input id="bk-ov" type="time" style="height:38px;min-width:0;-webkit-appearance:none;appearance:none"></div><button class="g" id="bk-ovnow" style="white-space:nowrap;height:38px">⏱ Сега</button></div>
+<div class="pc" id="bk-out" style="margin-top:8px"></div>
+<div class="g2" style="margin-top:8px"><div><label>Вентилатор (във фаза 2)</label><select id="bk-fan"><option>Без вентилатор</option><option>С вентилатор</option></select></div>
 <div><label>Общо печене</label><div class="pc" id="bk-tot" style="margin:0"></div></div></div>
 <div class="mu" id="bk-hint" style="margin-top:6px"></div>
 </div>
@@ -263,7 +265,7 @@ function formatTimeMins(mins) {
 }
 
 var PASTRY_STEPS=['Замесване','Окръгляне','Отпускане','Разточване','Финално отпускане'];
-var STEP_OPTS=['Приготвяне на левейн','Автолиза','Ферментолиза','Начало на добавяне на кваса','Замесване','Добавяне на солта','Край на замесване','Насипна ферментация','Lamination (Ламиниране)','Stretch & Fold','Coil Fold','Pre-shape (Преформиране)','Final Shape (Финално)','Топла ферментация','Прибиране в хладилник','Друго (ръчно)…'];
+var STEP_OPTS=['Приготвяне на левейн','Автолиза','Ферментолиза','Начало на добавяне на кваса','Замесване','Добавяне на солта','Край на замесване','Lamination (Ламиниране)','Stretch & Fold','Coil Fold','Pre-shape (Преформиране)','Final Shape (Финално)','Топла ферментация','Прибиране в хладилник','Друго (ръчно)…'];
 var KINDS={'Хляб':'🍞','Питка':'🫓','Багета':'🥖','Кроасан':'🥐','Панетоне':'🧁','Баница':'🥧','Пица':'🍕'};
 function kindIc(k){return KINDS[k]||'🍞'}
 function normBake(b){if(!b)return null;if(b.mode)return b;var free=/свободно/i.test(b.vessel||'');
@@ -271,21 +273,44 @@ return{mode:free?'free':'pot',d1:+b.temp||250,m1:+b.t1||0,d2:+b.temp||250,m2:+b.
 function bakeTxt(b){b=normBake(b);if(!b)return'';var pot=b.mode==='pot',o=(pot?'🍲 Тенджера: ':'🔥 Свободно: ')+b.d1+'°C · '+b.m1+' мин '+(pot?'с капак':'с пара');
 if(+b.m2>0)o+=' → '+b.d2+'°C · '+b.m2+' мин '+(pot?'без капак':'без пара');return o}
 function bakeMin(b){b=normBake(b);return b?(+b.m1||0)+(+b.m2||0):0}
-function stepTimes(xs){var out=[],prevAbs=null,base=null;(xs||[]).forEach(function(x){var r={has:false};
+function stepTimes(xs){var out=[],prevAbs=null;(xs||[]).forEach(function(x){var r={has:false};
  if(x&&x.t){var pp=String(x.t).split(':');if(pp.length>=2){var m=parseInt(pp[0])*60+parseInt(pp[1]);r.has=true;
-  if(prevAbs===null){r.first=true;r.diff=0;r.abs=m;base=m}else{var d=m-(prevAbs%1440);if(d<-720)d+=1440;if(d>720)d-=1440;r.first=false;r.diff=d;r.abs=prevAbs+d;r.warn=d<0}
-  r.el=r.abs-base;prevAbs=r.abs}}
- out.push(r)});return out}
+  if(prevAbs===null){r.abs=m;r.diff=0;r.listFirst=true}else{var d=m-(prevAbs%1440);if(d<-720)d+=1440;if(d>720)d-=1440;r.diff=d;r.abs=prevAbs+d;r.warn=d<0}
+  prevAbs=r.abs}}
+ out.push(r)});
+var si=-1;out.forEach(function(r,i){if(si<0&&r.has&&xs[i].n==='Приготвяне на левейн')si=i});
+if(si<0)out.forEach(function(r,i){if(si<0&&r.has)si=i});
+var base=si>=0?out[si].abs:0;out.forEach(function(r,i){if(r.has){r.el=r.abs-base;r.first=(i===si)}});
+out.si=si;out.base=base;out.last=null;out.forEach(function(r){if(r.has)out.last=r.abs});return out}
+function clk(a){var m=((a%1440)+1440)%1440;return ('0'+Math.floor(m/60)).slice(-2)+':'+('0'+(m%60)).slice(-2)}
+function ovAbs(xs,ov){var tt=stepTimes(xs),pp=String(ov).split(':'),m=parseInt(pp[0])*60+parseInt(pp[1]);if(tt.last===null)return m;var d=m-(tt.last%1440);if(d<-720)d+=1440;if(d>720)d-=1440;return tt.last+d}
+function bulkInfo(xs,tt){var ids=[],s0=null,ei=-1;(xs||[]).forEach(function(x,i){if(!tt[i].has)return;if(x.n==='Ферментолиза'||x.n==='Начало на добавяне на кваса'){ids.push(i);if(s0===null||tt[i].abs<s0)s0=tt[i].abs}
+ if(ei<0&&x.n==='Final Shape (Финално)')ei=i});
+if(s0===null)return null;return{s:s0,e:ei>=0?tt[ei].abs:null,ei:ei,ids:ids.filter(function(i){return tt[i].abs===s0})}}
+function stepMeta(xs){var tt=stepTimes(xs),B=bulkInfo(xs,tt),from=(tt.si>=0&&xs[tt.si].n==='Приготвяне на левейн')?'от левена':'от първата стъпка';
+return tt.map(function(r,i){var o={r:r,from:from};if(r.has&&B){if(r.abs===B.s&&B.ids.indexOf(i)>=0)o.bulk='🥖 Насипна започва';else if(r.abs>B.s&&(B.e===null||r.abs<=B.e))o.bulk=(B.ei===i?'🥖 Насипна общо: ':'🥖 Насипна до момента: ')+formatTimeMins(r.abs-B.s)}return o})}
+function sumLines(xs,bake){var tt=stepTimes(xs),B=bulkInfo(xs,tt),b=normBake(bake),L=[],tot=calcTotalTime(xs,bake),from=(tt.si>=0&&xs[tt.si].n==='Приготвяне на левейн')?'от левена':'от първата стъпка';
+if(tot>0)L.push('⌛ Общо '+from+' до изваждане: <b>'+formatTimeMins(tot)+'</b>');
+if(B){if(B.e!==null)L.push('🥖 Насипна ферментация: <b>'+formatTimeMins(B.e-B.s)+'</b> (от '+clk(B.s)+' до '+clk(B.e)+')');else L.push('🥖 Насипна ферментация от '+clk(B.s)+' (няма Final Shape)')}
+if(b&&b.ov)L.push('🔥 Във фурната '+b.ov+' → навън '+clk(ovAbs(xs,b.ov)+bakeMin(b)));
+return L}
+function sumBlock(xs,bake,st){var L=sumLines(xs,bake);return L.length?'<div style="'+st+'font-weight:bold;color:var(--ac);">'+L.join('<br>')+'</div>':''}
 function stepNums(xs){var prev=0;return (xs||[]).map(function(x){var v=parseInt(x.no);var num=(x.no!==undefined&&x.no!==null&&String(x.no).trim()!==''&&!isNaN(v))?v:prev+1;prev=num;return num})}
-function updateElapsed(){var cards=[].slice.call(document.querySelectorAll('#xs .step-card')),tt=stepTimes(cards.map(function(c){return{t:c.querySelector('.step-time').value}}));
-cards.forEach(function(c,i){var r=tt[i],el=c.querySelector('.step-info');if(!r.has){el.textContent='';return}
- el.innerHTML=r.first?'⏱ Начало':'⏱ '+formatTimeMins(Math.max(0,r.el))+' от началото · '+(r.diff>=0?'+':'−')+formatTimeMins(Math.abs(r.diff))+' от предишната'+(r.warn?' <b style="color:#c0392b">⚠️ по-рано от предишната</b>':'')})}
+function cardName(c){var cu=c.querySelector('.step-custom'),se=c.querySelector('.step-name');return(cu&&cu.style.display!=='none')?cu.value.trim():se.value}
+function cardsXs(){return [].map.call(document.querySelectorAll('#xs .step-card'),function(c){return{n:cardName(c),t:c.querySelector('.step-time').value}})}
+function updateElapsed(){var cards=[].slice.call(document.querySelectorAll('#xs .step-card')),mt=stepMeta(cardsXs());
+cards.forEach(function(c,i){var m=mt[i],r=m.r,el=c.querySelector('.step-info');if(!r.has){el.textContent='';return}
+ var t=r.first?'⏱ Начало':'⏱ '+m.from+': '+formatTimeMins(Math.max(0,r.el))+(r.listFirst?'':' · '+(r.diff>=0?'+':'−')+formatTimeMins(Math.abs(r.diff))+' от предишната')+(r.warn?' <b style="color:#c0392b">⚠️ по-рано от предишната</b>':'');
+ el.innerHTML=t+(m.bulk?'<br>'+m.bulk:'')});
+bkOut()}
 function renumber(){updateElapsed();var prev=0;document.querySelectorAll('#xs .step-card').forEach(function(c){var i=c.querySelector('.step-no'),v=parseInt(i.value),num=(i.value.trim()!==''&&!isNaN(v))?v:prev+1;i.placeholder=num;prev=num})}
-function stepsList(xs){var nums=stepNums(xs),tt=stepTimes(xs),h='';(xs||[]).forEach(function(x,i){var r=tt[i],tm='',diff='';
- if(r.has){tm='🕒 <b>'+x.t+'</b> – ';if(!r.first)diff=' <span class="mu">('+(r.warn?'⚠️ ':'')+(r.diff>=0?'+':'−')+formatTimeMins(Math.abs(r.diff))+' · общо '+formatTimeMins(Math.max(0,r.el))+')</span>'}
- h+='<div style="padding:3px 0;"><b>'+nums[i]+'.</b> '+tm+esc(x.n)+(x.ra?' · '+esc(x.ra):'')+(x.c?' · 🌡 '+esc(x.c)+'°C':'')+diff+(x.note?'<div class="mu" style="margin-left:22px;white-space:pre-wrap">📝 '+esc(x.note)+'</div>':'')+'</div>'});return h}
-function calcTotalTime(xs, bake){var bm=bakeMin(bake),T=stepTimes(xs).filter(function(r){return r.has});
-  if(T.length)return Math.max(0,T[T.length-1].el)+bm;return bm}
+function stepsList(xs){var nums=stepNums(xs),mt=stepMeta(xs),h='';(xs||[]).forEach(function(x,i){var r=mt[i].r,tm='',diff='';
+ if(r.has){tm='🕒 <b>'+x.t+'</b> – ';if(!r.first){var parts=[];if(!r.listFirst)parts.push((r.warn?'⚠️ ':'')+(r.diff>=0?'+':'−')+formatTimeMins(Math.abs(r.diff)));parts.push(mt[i].from+' '+formatTimeMins(Math.max(0,r.el)));diff=' <span class="mu">('+parts.join(' · ')+')</span>'}}
+ h+='<div style="padding:3px 0;"><b>'+nums[i]+'.</b> '+tm+esc(x.n)+(x.ra?' · '+esc(x.ra):'')+(x.c?' · 🌡 '+esc(x.c)+'°C':'')+diff+(mt[i].bulk?'<div class="mu" style="margin-left:22px">'+mt[i].bulk+'</div>':'')+(x.note?'<div class="mu" style="margin-left:22px;white-space:pre-wrap">📝 '+esc(x.note)+'</div>':'')+'</div>'});return h}
+function calcTotalTime(xs, bake){var bm=bakeMin(bake),tt=stepTimes(xs),b=normBake(bake);
+  if(tt.last===null)return bm;
+  var end=tt.last;if(b&&b.ov)end=ovAbs(xs,b.ov);
+  return Math.max(0,end-tt.base)+bm}
 
 document.querySelectorAll('nav button').forEach(function(b){b.onclick=function(){
 document.querySelectorAll('nav button,section').forEach(function(e){e.classList.remove('on')});
@@ -409,8 +434,7 @@ var bakeHtml = '';
 if(b.bake){var nb=normBake(b.bake);
     bakeHtml = '<div style="margin-top:10px; padding:10px; background:var(--bg); border-radius:8px; font-size:13px;"><b>🔥 Печене</b><br>' + esc(bakeTxt(nb)) + (nb.fan==='С вентилатор' ? '<br>🌀 С вентилатор във фаза 2' : '') + '</div>';
 }
-var totalMins = calcTotalTime(b.xs, b.bake);
-var totalHtml = totalMins > 0 ? '<div style="margin-top:10px; font-weight:bold; font-size:14px; color:var(--ac);">⌛ Общо време за приготвяне: ' + formatTimeMins(totalMins) + '</div>' : '';
+var totalHtml = sumBlock(b.xs, b.bake, 'margin-top:10px;font-size:14px;');
 
 return '<div class="c"><details><summary>'+kindIc(b.kind)+' '+esc(b.name)+' · '+b.hyd.toFixed(0)+'%'+(b.rating?' · ★'+b.rating:'')+'</summary>'
 +'<div class="mu">'+b.fl.map(function(f){return esc(f.n||'брашно')+' '+f.g+' г'}).join(', ')+'; вода '+b.w+' г'+(b.kind==='Баница'?'':'; квас '+b.s+' г')+'; сол '+b.sa+' г</div>'
@@ -693,8 +717,7 @@ $('#rec').innerHTML=S.recipes.length?'<div class="c"><h2>📖 Рецепти</h2
     if(r.bake){
         bakeHtml = '<div style="margin-top:6px; font-size:13px; color:var(--mu);">' + esc(bakeTxt(r.bake)) + '</div>';
     }
-    var totalMins = calcTotalTime(r.xs, r.bake);
-    var totalHtml = totalMins > 0 ? '<div style="margin-top:4px; font-size:13px; font-weight:bold;">⌛ Общо: ' + formatTimeMins(totalMins) + '</div>' : '';
+    var totalHtml = sumBlock(r.xs, r.bake, 'margin-top:4px;font-size:13px;');
 
     return '<details><summary>'+kindIc(r.kind)+' '+esc(r.name)+' · '+r.hyd.toFixed(0)+'%</summary><div class="mu">'+r.fl.map(function(f){return esc(f.n||'брашно')+' '+f.g+' г'}).join(', ')+'; вода '+r.w+' г'+(r.kind==='Баница'?'':'; квас '+r.s+' г')+'; сол '+r.sa+' г'+((r.fat||[]).length?'; мазнини: '+r.fat.map(function(x){return esc(x.n||'мазнина')+' '+x.g+' г'}).join(', '):'')+((r.ex||[]).length?'; '+(r.kind==='Баница'?'плънка: ':'')+r.ex.map(function(x){return esc(x.n||'добавка')+' '+x.g+' г'}).join(', '):'')+'</div>'
     + (stepsHtml ? '<div style="margin-top:8px;">'+stepsHtml+'</div>' : '') 
@@ -837,16 +860,18 @@ r.onload=async function(){try{var pkg=JSON.parse(r.result);if(!pkg.state)throw 0
 var have={};(await pAll(null)).forEach(function(q){have[q.k]=1});for(var q of(pkg.photos||[]))if(!have[q.k])await pDo('put',q);
 render();qr();recRender();flourList();refreshBlendFlourSelects();refreshNewBreadSelects();bkMsg('Възстановено.');e.target.value=''}catch(x){bkMsg('Невалиден файл.')}};
 r.readAsText(f)};
-function bkRead(){return{mode:$('#bk-mode').value,d1:n($('#bk-d1').value),m1:n($('#bk-m1').value),d2:n($('#bk-d2').value),m2:n($('#bk-m2').value),fan:$('#bk-fan').value}}
+function bkRead(){return{ov:($('#bk-ov')||{}).value||'',mode:$('#bk-mode').value,d1:n($('#bk-d1').value),m1:n($('#bk-m1').value),d2:n($('#bk-d2').value),m2:n($('#bk-m2').value),fan:$('#bk-fan').value}}
 function bkUI(){var bm0=$('#bk-mode');if(!bm0.value&&bm0.options.length)bm0.value=bm0.options[0].value;var pot=$('#bk-mode').value==='pot',b=bkRead();
 $('#bk-l1').textContent=pot?'1. С капак':'1. С пара';
 $('#bk-l2').textContent=pot?'2. Без капак — махни капака и свали градусите':'2. Без пара — извади съда с водата и свали градусите';
 $('#bk-hint').textContent=pot?'':'Парата: тава с вряла вода, лед или пръскане в първите минути.';
-$('#bk-tot').textContent=(b.m1+b.m2)+' мин ('+formatTimeMins(b.m1+b.m2)+')'}
+$('#bk-tot').textContent=(b.m1+b.m2)+' мин ('+formatTimeMins(b.m1+b.m2)+')';bkOut()}
 function bkSet(b){b=normBake(b)||{mode:'pot',d1:250,m1:20,d2:220,m2:25,fan:'Без вентилатор'};if(window.curKind==='Баница')b=Object.assign({},b,{mode:'free'});
-$('#bk-mode').value=b.mode;$('#bk-d1').value=b.d1;$('#bk-m1').value=b.m1;$('#bk-d2').value=b.d2;$('#bk-m2').value=b.m2;$('#bk-fan').value=b.fan||'Без вентилатор';bkUI()}
+$('#bk-ov').value=b.ov||'';$('#bk-mode').value=b.mode;$('#bk-d1').value=b.d1;$('#bk-m1').value=b.m1;$('#bk-d2').value=b.d2;$('#bk-m2').value=b.m2;$('#bk-fan').value=b.fan||'Без вентилатор';bkUI()}
 $('#bk-mode').onchange=function(){var pot=this.value==='pot';$('#bk-d1').value=250;$('#bk-m1').value=pot?20:15;$('#bk-d2').value=220;$('#bk-m2').value=25;bkUI()};
-['bk-d1','bk-m1','bk-d2','bk-m2'].forEach(function(i){$('#'+i).oninput=bkUI});
+['bk-d1','bk-m1','bk-d2','bk-m2','bk-ov'].forEach(function(i){$('#'+i).oninput=bkUI});
+$('#bk-ovnow').onclick=function(){$('#bk-ov').value=new Date().toTimeString().slice(0,5);bkUI();draftSaveSoon()};
+function bkOut(){var o=$('#bk-out');if(!o)return;var L=sumLines(cardsXs(),bkRead());o.innerHTML=L.length?L.join('<br>'):'Задай часове на стъпките и час на влизане във фурната, за да видиш общото време.'}
 function setKind(k,user){var was=window.curKind,p=k==='Баница';window.curKind=k;
 $('#wrap-s').style.display=p?'none':'';$('#wrap-sh').style.display=p?'none':'';
 if(p)$('#s').value=0;
